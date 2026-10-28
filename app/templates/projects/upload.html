@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Version Archive — {{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="workspace-wrapper">
+  {% include 'components/sidebar.html' %}
+
+  <div class="workspace-content">
+    <div class="mb-4">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb small">
+          <li class="breadcrumb-item"><a href="{{ url_for('projects.index') }}" class="text-cyan text-decoration-none">Projects</a></li>
+          <li class="breadcrumb-item"><a href="{{ url_for('projects.detail', project_id=project.id) }}" class="text-cyan text-decoration-none">{{ project.name }}</a></li>
+          <li class="breadcrumb-item active text-muted" aria-current="page">Upload Version</li>
+        </ol>
+      </nav>
+      <h2 class="fw-bold text-main mb-1">Upload Version Archive</h2>
+      <p class="text-muted small mb-0">Project: <strong class="text-main">{{ project.name }}</strong> &bull; Target Release: <span class="badge badge-info font-mono">v{{ next_version_num }}.0</span></p>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="card-wp p-4">
+          <form method="POST" action="{{ url_for('projects.upload_version', project_id=project.id) }}" enctype="multipart/form-data" novalidate data-submit-loader>
+            {{ form.hidden_tag() }}
+
+            <!-- Dropzone Area -->
+            <div class="upload-dropzone mb-4" id="dropzoneContainer" onclick="document.getElementById('archiveInput').click()">
+              <i class="bi bi-cloud-arrow-up text-cyan display-4 d-block mb-3"></i>
+              <h5 class="fw-bold text-main mb-1" id="dropzoneTitle">Click to browse or drag and drop your project ZIP file</h5>
+              <p class="text-muted small mb-0" id="dropzoneSubtitle">Accepts .zip archives only (up to 50 MB max)</p>
+              {{ form.archive(class="d-none", id="archiveInput", onchange="handleFileSelect(this)") }}
+            </div>
+            {% for error in form.archive.errors %}
+              <div class="text-rose small mb-3"><i class="bi bi-exclamation-triangle me-1"></i>{{ error }}</div>
+            {% endfor %}
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="version_label" class="form-label">{{ form.version_label.label.text }}</label>
+                {{ form.version_label(class="form-control" + (" is-invalid" if form.version_label.errors else ""), id="version_label", placeholder="e.g. v" ~ next_version_num ~ ".0 — Initial Build") }}
+                {% for error in form.version_label.errors %}
+                  <div class="text-rose small mt-1">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-6">
+                <label for="notes" class="form-label">{{ form.notes.label.text }}</label>
+                {{ form.notes(class="form-control" + (" is-invalid" if form.notes.errors else ""), id="notes") }}
+                {% for error in form.notes.errors %}
+                  <div class="text-rose small mt-1">{{ error }}</div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between pt-3 border-top" style="border-color: rgba(255,255,255,0.08) !important;">
+              <a href="{{ url_for('projects.detail', project_id=project.id) }}" class="btn btn-outline-light px-4">Cancel</a>
+              <button type="submit" class="btn btn-cyan px-4">
+                <i class="bi bi-upload me-1"></i> Ingest & Validate Archive
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card-wp p-4 mb-3">
+          <h6 class="fw-bold text-main mb-2"><i class="bi bi-shield-check text-emerald me-1"></i> Security Checks Performed</h6>
+          <ul class="text-muted small ps-3 mb-0 d-flex flex-column gap-2">
+            <li><strong>Anti-Zip-Slip:</strong> Blocks any relative traversal sequences (<code>../</code>) or absolute paths.</li>
+            <li><strong>Decompression Bombs:</strong> Verifies archive entry ratios and enforces a 150MB uncompressed ceiling.</li>
+            <li><strong>Secret Scrubbing:</strong> Detects and skips sensitive <code>.env</code> and <code>.pem</code> credentials.</li>
+            <li><strong>Private Isolation:</strong> Stored securely in your private user storage folder.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function handleFileSelect(input) {
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+    document.getElementById('dropzoneTitle').innerText = file.name;
+    document.getElementById('dropzoneSubtitle').innerText = `${sizeMb} MB — Ready to Ingest`;
+    document.getElementById('dropzoneContainer').style.borderColor = 'var(--wp-cyan)';
+    document.getElementById('dropzoneContainer').style.backgroundColor = 'rgba(56, 189, 248, 0.08)';
+  }
+}
+
+// Drag & drop listeners
+const dropzone = document.getElementById('dropzoneContainer');
+['dragenter', 'dragover'].forEach(eventName => {
+  dropzone.addEventListener(eventName, (e) => {
+    e.preventDefault();
+    dropzone.classList.add('dragover');
+  }, false);
+});
+['dragleave', 'drop'].forEach(eventName => {
+  dropzone.addEventListener(eventName, (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+  }, false);
+});
+dropzone.addEventListener('drop', (e) => {
+  const dt = e.dataTransfer;
+  const files = dt.files;
+  if (files && files[0]) {
+    document.getElementById('archiveInput').files = files;
+    handleFileSelect(document.getElementById('archiveInput'));
+  }
+});
+</script>
+{% endblock %}

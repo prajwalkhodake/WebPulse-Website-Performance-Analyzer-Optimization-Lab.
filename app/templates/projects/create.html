@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Project{% endblock %}
+
+{% block content %}
+<div class="workspace-wrapper">
+  {% include 'components/sidebar.html' %}
+
+  <div class="workspace-content">
+    <div class="mb-4">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb small">
+          <li class="breadcrumb-item"><a href="{{ url_for('projects.index') }}" class="text-cyan text-decoration-none">Projects</a></li>
+          <li class="breadcrumb-item active text-muted" aria-current="page">New Project</li>
+        </ol>
+      </nav>
+      <h2 class="fw-bold text-main mb-1">Create Web Project</h2>
+      <p class="text-muted small mb-0">Set up a new workspace for source code inspection and performance testing</p>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="card-wp p-4">
+          <form method="POST" action="{{ url_for('projects.create') }}" novalidate data-submit-loader>
+            {{ form.hidden_tag() }}
+
+            <div class="mb-3">
+              <label for="name" class="form-label">{{ form.name.label.text }} <span class="text-rose">*</span></label>
+              {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), id="name") }}
+              {% for error in form.name.errors %}
+                <div class="text-rose small mt-1">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="mb-3">
+              <label for="description" class="form-label">{{ form.description.label.text }}</label>
+              {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), id="description") }}
+              {% for error in form.description.errors %}
+                <div class="text-rose small mt-1">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="mb-4">
+              <label for="entry_point" class="form-label">{{ form.entry_point.label.text }}</label>
+              {{ form.entry_point(class="form-control" + (" is-invalid" if form.entry_point.errors else ""), id="entry_point") }}
+              <div class="form-text text-dim small">The primary HTML document to launch during browser sandbox audits (default: index.html).</div>
+              {% for error in form.entry_point.errors %}
+                <div class="text-rose small mt-1">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+              <button type="submit" class="btn btn-cyan px-4">
+                <i class="bi bi-check2-circle me-1"></i> Create Project
+              </button>
+              <a href="{{ url_for('projects.index') }}" class="btn btn-outline-light px-4">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card-wp p-4 mb-3">
+          <h6 class="fw-bold text-main mb-2"><i class="bi bi-info-circle text-cyan me-1"></i> What happens next?</h6>
+          <p class="text-muted small mb-0">
+            Once created, you will be prompted to upload your project's ZIP archive. WebPulse will validate the archive, extract files into private user storage, and inventory every asset automatically.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

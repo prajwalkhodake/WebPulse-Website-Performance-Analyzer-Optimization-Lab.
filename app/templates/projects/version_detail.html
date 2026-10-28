@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.name }} — {{ version.version_label }}{% endblock %}
+
+{% block content %}
+<div class="workspace-wrapper">
+  {% include 'components/sidebar.html' %}
+
+  <div class="workspace-content">
+    <div class="mb-4">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb small">
+          <li class="breadcrumb-item"><a href="{{ url_for('projects.index') }}" class="text-cyan text-decoration-none">Projects</a></li>
+          <li class="breadcrumb-item"><a href="{{ url_for('projects.detail', project_id=project.id) }}" class="text-cyan text-decoration-none">{{ project.name }}</a></li>
+          <li class="breadcrumb-item active text-muted" aria-current="page">{{ version.version_label }}</li>
+        </ol>
+      </nav>
+
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div>
+          <div class="d-flex align-items-center gap-2">
+            <h2 class="fw-bold text-main mb-0">{{ version.version_label }}</h2>
+            <span class="badge badge-info font-mono">Release #{{ version.version_number }}</span>
+          </div>
+          <p class="text-muted small mb-0 mt-1">{{ version.notes or 'No changelog notes provided for this snapshot.' }}</p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <form method="POST" action="{{ url_for('analysis.run_analysis', version_id=version.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-cyan btn-sm px-3 shadow">
+              <i class="bi bi-search me-1"></i> Run Static Audit
+            </button>
+          </form>
+
+          <form method="POST" action="{{ url_for('performance.run_test', version_id=version.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="preset" value="desktop">
+            <button type="submit" class="btn btn-outline-cyan btn-sm px-3">
+              <i class="bi bi-play-circle me-1"></i> Run Playwright Test
+            </button>
+          </form>
+
+          <a href="{{ url_for('reports.html_report', version_id=version.id) }}?print=1" target="_blank" class="btn btn-outline-cyan btn-sm px-3">
+            <i class="bi bi-file-earmark-pdf-fill me-1"></i> Print / PDF Report
+          </a>
+          <a href="{{ url_for('reports.html_report', version_id=version.id) }}" target="_blank" class="btn btn-outline-light btn-sm px-3">
+            <i class="bi bi-file-earmark-richtext me-1"></i> View Report
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Suite Navigation Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-lg-3">
+        <a href="{{ url_for('analysis.findings', version_id=version.id) if version.has_analysis else '#' }}" class="text-decoration-none">
+          <div class="card-wp p-3 card-wp-hover h-100">
+            <div class="d-flex align-items-center justify-content-between text-muted small mb-1">
+              <span class="text-uppercase fw-bold text-dim">Static Findings</span>
+              <i class="bi bi-exclamation-octagon text-cyan fs-5"></i>
+            </div>
+            {% if version.has_analysis %}
+              <div class="h3 fw-bold text-main mb-0">{{ version.analysis.findings|length }}</div>
+              <div class="small text-emerald mt-1"><i class="bi bi-check2"></i> View line-by-line issues</div>
+            {% else %}
+              <div class="h3 fw-bold text-dim mb-0">—</div>
+              <div class="small text-amber mt-1">Audit required</div>
+            {% endif %}
+          </div>
+        </a>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <a href="{{ url_for('analysis.graph', version_id=version.id) if version.has_analysis else '#' }}" class="text-decoration-none">
+          <div class="card-wp p-3 card-wp-hover h-100">
+            <div class="d-flex align-items-center justify-content-between text-muted small mb-1">
+              <span class="text-uppercase fw-bold text-dim">Dependency Graph</span>
+              <i class="bi bi-diagram-3 text-indigo fs-5"></i>
+            </div>
+            {% if version.has_analysis %}
+              <div class="h3 fw-bold text-main mb-0">{{ version.dependency_edges|length }}</div>
+              <div class="small text-indigo mt-1"><i class="bi bi-arrow-right"></i> Cytoscape.js Network</div>
+            {% else %}
+              <div class="h3 fw-bold text-dim mb-0">—</div>
+              <div class="small text-muted mt-1">Audit required</div>
+            {% endif %}
+          </div>
+        </a>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <a href="{{ url_for('performance.audit', version_id=version.id) if version.latest_test_run else '#' }}" class="text-decoration-none">
+          <div class="card-wp p-3 card-wp-hover h-100">
+            <div class="d-flex align-items-center justify-content-between text-muted small mb-1">
+              <span class="text-uppercase fw-bold text-dim">Browser Lab Score</span>
+              <i class="bi bi-stopwatch text-emerald fs-5"></i>
+            </div>
+            {% if version.latest_test_run and version.latest_test_run.performance_score %}
+              {% set score = version.latest_test_run.performance_score %}
+              <div class="h3 fw-bold text-main mb-0 font-mono">{{ score }} <span class="small text-dim">/ 100</span></div>
+              <div class="small text-emerald mt-1"><i class="bi bi-check2"></i> Core Web Vitals ready</div>
+            {% else %}
+              <div class="h3 fw-bold text-dim mb-0">—</div>
+              <div class="small text-amber mt-1">Launch Playwright test</div>
+            {% endif %}
+          </div>
+        </a>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <a href="{{ url_for('recommendations.index', version_id=version.id) if version.has_analysis else '#' }}" class="text-decoration-none">
+          <div class="card-wp p-3 card-wp-hover h-100">
+            <div class="d-flex align-items-center justify-content-between text-muted small mb-1">
+              <span class="text-uppercase fw-bold text-dim">Recommendations</span>
+              <i class="bi bi-lightning-charge text-amber fs-5"></i>
+            </div>
+            {% if version.has_analysis %}
+              <div class="h3 fw-bold text-main mb-0">{{ version.recommendations|length }}</div>
+              <div class="small text-amber mt-1"><i class="bi bi-arrow-right"></i> Actionable improvements</div>
+            {% else %}
+              <div class="h3 fw-bold text-dim mb-0">—</div>
+              <div class="small text-muted mt-1">Audit required</div>
+            {% endif %}
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- File Inventory Explorer -->
+    <div class="card-wp p-4 mb-4">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 border-bottom pb-3 mb-3" style="border-color: rgba(255,255,255,0.08) !important;">
+        <div>
+          <h5 class="fw-bold text-main mb-0">File Inventory Explorer</h5>
+          <span class="small text-dim">{{ version.total_files }} files &bull; {{ version.total_size_kb }} KB total payload</span>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <input type="text" id="fileSearchInput" class="form-control form-control-sm" placeholder="Filter files by path..." style="max-width: 260px;" onkeyup="filterFilesTable()">
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle mb-0" id="fileInventoryTable" style="background: transparent;">
+          <thead>
+            <tr class="border-bottom" style="border-color: rgba(255,255,255,0.08) !important;">
+              <th class="text-dim small text-uppercase">Relative Path</th>
+              <th class="text-dim small text-uppercase">Category</th>
+              <th class="text-dim small text-uppercase">File Size</th>
+              <th class="text-dim small text-uppercase">Lines</th>
+              <th class="text-dim small text-uppercase text-end">Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for file in version.files %}
+              <tr class="file-row" style="border-color: rgba(255,255,255,0.04);">
+                <td>
+                  <span class="font-mono small text-main">{{ file.relative_path }}</span>
+                </td>
+                <td>
+                  {% if file.file_type == 'html' %}
+                    <span class="badge badge-info">HTML</span>
+                  {% elif file.file_type == 'css' %}
+                    <span class="badge" style="background: rgba(129, 140, 248, 0.2); color: #a5b4fc; border: 1px solid rgba(129, 140, 248, 0.3);">CSS</span>
+                  {% elif file.file_type == 'javascript' %}
+                    <span class="badge badge-warning">JS</span>
+                  {% elif file.file_type == 'image' %}
+                    <span class="badge badge-success">Image</span>
+                  {% else %}
+                    <span class="badge bg-secondary">{{ file.file_type }}</span>
+                  {% endif %}
+                </td>
+                <td class="font-mono small text-dim">{{ file.file_size_kb }} KB</td>
+                <td class="font-mono small text-dim">{{ file.line_count if file.line_count is not none else '—' }}</td>
+                <td class="text-end">
+                  {% if file.is_entry_point %}
+                    <span class="badge rounded-pill bg-cyan text-dark fw-bold px-2 py-1" style="font-size: 0.7rem;">
+                      <i class="bi bi-star-fill me-1"></i> Entry Point
+                    </span>
+                  {% else %}
+                    <span class="text-dim small">Asset</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function filterFilesTable() {
+  const query = document.getElementById('fileSearchInput').value.toLowerCase();
+  const rows = document.querySelectorAll('#fileInventoryTable .file-row');
+  rows.forEach(row => {
+    const text = row.innerText.toLowerCase();
+    row.style.display = text.includes(query) ? '' : 'none';
+  });
+}
+</script>
+{% endblock %}

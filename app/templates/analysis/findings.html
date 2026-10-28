@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Static Findings — {{ version.project.name }}{% endblock %}
+
+{% block content %}
+<div class="workspace-wrapper">
+  {% include 'components/sidebar.html' %}
+
+  <div class="workspace-content">
+    <div class="mb-4">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb small">
+          <li class="breadcrumb-item"><a href="{{ url_for('projects.index') }}" class="text-cyan text-decoration-none">Projects</a></li>
+          <li class="breadcrumb-item"><a href="{{ url_for('projects.detail', project_id=version.project.id) }}" class="text-cyan text-decoration-none">{{ version.project.name }}</a></li>
+          <li class="breadcrumb-item"><a href="{{ url_for('projects.version_detail', project_id=version.project.id, version_id=version.id) }}" class="text-cyan text-decoration-none">{{ version.version_label }}</a></li>
+          <li class="breadcrumb-item active text-muted" aria-current="page">Static Findings</li>
+        </ol>
+      </nav>
+
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div>
+          <h2 class="fw-bold text-main mb-1">Static Analysis Findings</h2>
+          <p class="text-muted small mb-0">Evidence-based code inspection across HTML, CSS, JavaScript, and assets</p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <a href="{{ url_for('analysis.graph', version_id=version.id) }}" class="btn btn-outline-cyan btn-sm px-3">
+            <i class="bi bi-diagram-3 me-1"></i> Dependency Graph
+          </a>
+          <a href="{{ url_for('recommendations.index', version_id=version.id) }}" class="btn btn-cyan btn-sm px-3">
+            <i class="bi bi-lightning-charge me-1"></i> View Action Plan
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="card-wp p-3 mb-4">
+      <form method="GET" action="{{ url_for('analysis.findings', version_id=version.id) }}" class="row g-2 align-items-center">
+        <div class="col-md-5">
+          <div class="input-group input-group-sm">
+            <span class="input-group-text bg-dark border-secondary text-dim"><i class="bi bi-search"></i></span>
+            <input type="text" name="q" value="{{ search_query }}" class="form-control" placeholder="Search by title, explanation, or filename...">
+          </div>
+        </div>
+        <div class="col-md-3">
+          <select name="category" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="">All Categories</option>
+            <option value="performance" {% if category_filter == 'performance' %}selected{% endif %}>Performance</option>
+            <option value="accessibility" {% if category_filter == 'accessibility' %}selected{% endif %}>Accessibility</option>
+            <option value="best_practices" {% if category_filter == 'best_practices' %}selected{% endif %}>Best Practices</option>
+            <option value="seo" {% if category_filter == 'seo' %}selected{% endif %}>SEO & Discoverability</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <select name="severity" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="">All Severities</option>
+            <option value="critical" {% if severity_filter == 'critical' %}selected{% endif %}>Critical</option>
+            <option value="warning" {% if severity_filter == 'warning' %}selected{% endif %}>Warning</option>
+            <option value="info" {% if severity_filter == 'info' %}selected{% endif %}>Informational</option>
+          </select>
+        </div>
+        <div class="col-md-1 text-end">
+          <a href="{{ url_for('analysis.findings', version_id=version.id) }}" class="btn btn-sm btn-outline-light w-100" title="Reset Filters">
+            <i class="bi bi-x-circle"></i>
+          </a>
+        </div>
+      </form>
+    </div>
+
+    <!-- Findings List Accordion / Cards -->
+    {% if findings %}
+      <div class="d-flex flex-column gap-3 mb-4">
+        {% for f in findings %}
+          <div class="card-wp p-4" style="border-left: 4px solid {% if f.severity == 'critical' %}var(--wp-rose){% elif f.severity == 'warning' %}var(--wp-amber){% else %}var(--wp-cyan){% endif %} !important;">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge badge-{{ f.severity }} text-uppercase">{{ f.severity }}</span>
+                <span class="badge bg-secondary font-mono">{{ f.category }}</span>
+                <code class="text-cyan small">{{ f.finding_code }}</code>
+              </div>
+              <span class="small text-dim">Confidence: <strong>{{ f.confidence|capitalize }}</strong></span>
+            </div>
+
+            <h5 class="fw-bold text-main mb-2">{{ f.title }}</h5>
+            <p class="text-muted small mb-3">{{ f.explanation }}</p>
+
+            {% if f.evidence %}
+              <div class="p-2 rounded bg-dark border border-secondary mb-3 small font-mono text-dim" style="background-color: #0b101b !important;">
+                <span class="text-emerald">// Evidence:</span> {{ f.evidence }}
+              </div>
+            {% endif %}
+
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-3 border-top" style="border-color: rgba(255,255,255,0.06) !important;">
+              <div class="small text-dim font-mono">
+                <i class="bi bi-file-earmark-code me-1 text-cyan"></i>
+                {{ f.affected_file.relative_path if f.affected_file else 'Project Configuration' }}
+                {% if f.line_number %}<span class="text-main">(line {{ f.line_number }})</span>{% endif %}
+              </div>
+              <div class="small text-emerald">
+                <i class="bi bi-tools me-1"></i> {{ f.recommended_action[:90] }}...
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card-wp p-5 text-center my-4">
+        <i class="bi bi-check2-circle text-emerald display-4 d-block mb-3"></i>
+        <h5 class="fw-bold text-main mb-2">No Matching Findings Found</h5>
+        <p class="text-muted small mb-0">No code issues match your filter criteria or the static inspection clean sheet is verified.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

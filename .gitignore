@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtualenv
+.venv/
+
+# Environment variables
+.env
+.env.local
+
+# SQLite Database & Instance storage
+instance/
+*.sqlite3
+*.db
+
+# Private upload & extracted project archives
+storage/
+media_private/
+test_storage/
+tests/test_storage/
+_legacy_django/
+
+# Pytest / Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Playwright
+.playwright/
+test-results/
+
+# IDE & OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo

@@ -1,0 +1,25 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="container-fluid px-4 pt-3">
+      {% for category, message in messages %}
+        {% set alert_type = 'info' %}
+        {% set alert_icon = 'bi-info-circle-fill' %}
+        {% if category == 'success' %}
+          {% set alert_type = 'success' %}
+          {% set alert_icon = 'bi-check-circle-fill' %}
+        {% elif category in ['danger', 'error'] %}
+          {% set alert_type = 'danger' %}
+          {% set alert_icon = 'bi-exclamation-triangle-fill' %}
+        {% elif category == 'warning' %}
+          {% set alert_type = 'warning' %}
+          {% set alert_icon = 'bi-exclamation-circle-fill' %}
+        {% endif %}
+        <div class="alert alert-{{ alert_type }} alert-dismissible fade show d-flex align-items-center shadow-sm" role="alert" style="background-color: var(--wp-surface-2); border-color: rgba(255,255,255,0.1); color: var(--wp-text-main);">
+          <i class="bi {{ alert_icon }} me-2 fs-5 {% if alert_type == 'success' %}text-emerald{% elif alert_type == 'danger' %}text-rose{% elif alert_type == 'warning' %}text-amber{% else %}text-cyan{% endif %}"></i>
+          <div class="flex-grow-1">{{ message }}</div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}

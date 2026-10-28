@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+
+{% block title %}Dependency Graph — {{ version.project.name }}{% endblock %}
+
+{% block extra_head %}
+<!-- Cytoscape.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="workspace-wrapper">
+  {% include 'components/sidebar.html' %}
+
+  <div class="workspace-content">
+    <div class="mb-4">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb small">
+          <li class="breadcrumb-item"><a href="{{ url_for('projects.index') }}" class="text-cyan text-decoration-none">Projects</a></li>
+          <li class="breadcrumb-item"><a href="{{ url_for('projects.detail', project_id=version.project.id) }}" class="text-cyan text-decoration-none">{{ version.project.name }}</a></li>
+          <li class="breadcrumb-item"><a href="{{ url_for('projects.version_detail', project_id=version.project.id, version_id=version.id) }}" class="text-cyan text-decoration-none">{{ version.version_label }}</a></li>
+          <li class="breadcrumb-item active text-muted" aria-current="page">Dependency Graph</li>
+        </ol>
+      </nav>
+
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div>
+          <h2 class="fw-bold text-main mb-1">Interactive Dependency Graph</h2>
+          <p class="text-muted small mb-0">Visualizes HTML document links, imported stylesheets, scripts, raster assets, and broken local references</p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-outline-cyan btn-sm" onclick="cyFit()"><i class="bi bi-arrows-fullscreen me-1"></i> Fit View</button>
+          <a href="{{ url_for('analysis.findings', version_id=version.id) }}" class="btn btn-cyan btn-sm">
+            <i class="bi bi-search me-1"></i> View Findings
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Graph Card Layout -->
+    <div class="row g-3">
+      <div class="col-lg-9">
+        <div class="card-wp p-3" style="position: relative;">
+          <!-- Cytoscape viewport -->
+          <div id="cy-container" style="height: 640px; width: 100%; border-radius: 8px;"></div>
+
+          <!-- Graph Controls Overlay -->
+          <div class="d-flex align-items-center gap-2 position-absolute top-0 end-0 m-4 p-2 rounded-3 shadow" style="background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); border: 1px solid var(--wp-border);">
+            <input type="text" id="nodeSearch" class="form-control form-control-sm" placeholder="Find file..." style="width: 140px;" onkeyup="searchNodes()">
+            <button class="btn btn-dark btn-sm border-secondary text-dim" onclick="cyZoomIn()"><i class="bi bi-plus-lg"></i></button>
+            <button class="btn btn-dark btn-sm border-secondary text-dim" onclick="cyZoomOut()"><i class="bi bi-dash-lg"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Node Inspector Details -->
+      <div class="col-lg-3">
+        <div class="card-wp p-3 mb-3">
+          <h6 class="fw-bold text-main mb-2"><i class="bi bi-info-circle text-cyan me-1"></i> Selected Node</h6>
+          <div id="nodeDetailsEmpty" class="text-muted small py-3 text-center">
+            Click any file node in the graph to inspect incoming/outgoing references and asset details.
+          </div>
+          <div id="nodeDetailsContent" class="d-none">
+            <div class="small text-dim text-uppercase fw-bold">File Path:</div>
+            <div class="font-mono small text-main text-break mb-2" id="nodeDetailPath">index.html</div>
+
+            <div class="small text-dim text-uppercase fw-bold">Category:</div>
+            <div class="mb-2" id="nodeDetailCategory"><span class="badge badge-info">HTML</span></div>
+
+            <div class="small text-dim text-uppercase fw-bold">Size:</div>
+            <div class="font-mono small text-main mb-3" id="nodeDetailSize">0 KB</div>
+
+            <div class="border-top pt-2" style="border-color: rgba(255,255,255,0.08) !important;">
+              <span class="small text-muted" id="nodeDetailRole">Entry Point Document</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-wp p-3">
+          <h6 class="fw-bold text-main mb-3"><i class="bi bi-palette text-indigo me-1"></i> Legend</h6>
+          <div class="d-flex flex-column gap-2 small">
+            <div class="d-flex align-items-center gap-2"><span style="width:12px; height:12px; border-radius:3px; background:#38bdf8;"></span><span>HTML Document</span></div>
+            <div class="d-flex align-items-center gap-2"><span style="width:12px; height:12px; border-radius:3px; background:#818cf8;"></span><span>CSS Stylesheet</span></div>
+            <div class="d-flex align-items-center gap-2"><span style="width:12px; height:12px; border-radius:3px; background:#f59e0b;"></span><span>JavaScript Script</span></div>
+            <div class="d-flex align-items-center gap-2"><span style="width:12px; height:12px; border-radius:3px; background:#10b981;"></span><span>Image Asset</span></div>
+            <div class="d-flex align-items-center gap-2"><span style="width:12px; height:12px; border-radius:3px; background:#ef4444;"></span><span>Broken / Missing Local Link</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let cy = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+  fetch("{{ url_for('analysis.graph_data', version_id=version.id) }}")
+    .then(res => res.json())
+    .then(data => {
+      initCytoscape(data.elements);
+    })
+    .catch(err => {
+      document.getElementById('cy-container').innerHTML = '<div class="p-5 text-center text-muted">Failed to load graph data.</div>';
+    });
+});
+
+function initCytoscape(elements) {
+  cy = cytoscape({
+    container: document.getElementById('cy-container'),
+    elements: elements,
+    style: [
+      {
+        selector: 'node',
+        style: {
+          'label': 'data(label)',
+          'color': '#f8fafc',
+          'font-size': '11px',
+          'font-family': 'Inter, sans-serif',
+          'background-color': '#94a3b8',
+          'text-valign': 'bottom',
+          'text-margin-y': 5,
+          'width': 34,
+          'height': 34,
+          'border-width': 2,
+          'border-color': 'rgba(255,255,255,0.2)'
+        }
+      },
+      {
+        selector: 'node[file_type = "html"]',
+        style: { 'background-color': '#38bdf8', 'border-color': '#7dd3fc' }
+      },
+      {
+        selector: 'node[file_type = "css"]',
+        style: { 'background-color': '#818cf8', 'border-color': '#a5b4fc' }
+      },
+      {
+        selector: 'node[file_type = "javascript"]',
+        style: { 'background-color': '#f59e0b', 'border-color': '#fcd34d' }
+      },
+      {
+        selector: 'node[file_type = "image"]',
+        style: { 'background-color': '#10b981', 'border-color': '#6ee7b7' }
+      },
+      {
+        selector: 'node[file_type = "broken_missing"]',
+        style: { 'background-color': '#ef4444', 'border-color': '#fca5a5', 'shape': 'diamond', 'width': 40, 'height': 40 }
+      },
+      {
+        selector: 'node[?is_entry]',
+        style: { 'border-width': 4, 'border-color': '#f8fafc', 'width': 44, 'height': 44 }
+      },
+      {
+        selector: 'edge',
+        style: {
+          'width': 2,
+          'line-color': 'rgba(255,255,255,0.15)',
+          'target-arrow-color': 'rgba(255,255,255,0.25)',
+          'target-arrow-shape': 'triangle',
+          'curve-style': 'bezier'
+        }
+      },
+      {
+        selector: 'edge[?is_broken]',
+        style: {
+          'line-color': '#ef4444',
+          'target-arrow-color': '#ef4444',
+          'line-style': 'dashed',
+          'width': 3
+        }
+      },
+      {
+        selector: 'node:selected',
+        style: {
+          'border-color': '#38bdf8',
+          'border-width': 4
+        }
+      }
+    ],
+    layout: {
+      name: 'cose',
+      idealEdgeLength: 80,
+      nodeOverlap: 20,
+      refresh: 20,
+      fit: true,
+      padding: 30,
+      randomize: false,
+      componentSpacing: 100,
+      nodeRepulsion: 400000,
+      edgeElasticity: 100
+    }
+  });
+
+  cy.on('tap', 'node', function(evt){
+    const node = evt.target;
+    const data = node.data();
+    document.getElementById('nodeDetailsEmpty').classList.add('d-none');
+    document.getElementById('nodeDetailsContent').classList.remove('d-none');
+    document.getElementById('nodeDetailPath').innerText = data.full_path;
+    document.getElementById('nodeDetailCategory').innerHTML = `<span class="badge badge-info">${data.file_type.toUpperCase()}</span>`;
+    document.getElementById('nodeDetailSize').innerText = `${data.size_kb} KB`;
+    document.getElementById('nodeDetailRole').innerText = data.is_entry ? '⭐ Project Entry Point' : (data.file_type === 'broken_missing' ? '❌ Missing Resource 404' : 'Passive Asset');
+  });
+}
+
+function cyFit() { if (cy) cy.fit(); }
+function cyZoomIn() { if (cy) cy.zoom(cy.zoom() * 1.25); }
+function cyZoomOut() { if (cy) cy.zoom(cy.zoom() * 0.8); }
+
+function searchNodes() {
+  if (!cy) return;
+  const q = document.getElementById('nodeSearch').value.toLowerCase().trim();
+  cy.batch(() => {
+    if (!q) {
+      cy.nodes().style('opacity', 1);
+      return;
+    }
+    cy.nodes().forEach(n => {
+      const label = (n.data('label') || '').toLowerCase();
+      const path = (n.data('full_path') || '').toLowerCase();
+      if (label.includes(q) || path.includes(q)) {
+        n.style('opacity', 1);
+      } else {
+        n.style('opacity', 0.2);
+      }
+    });
+  });
+}
+</script>
+{% endblock %}

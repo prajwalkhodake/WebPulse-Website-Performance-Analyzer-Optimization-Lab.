@@ -1,0 +1,26 @@
+<footer class="mt-auto py-4 border-top" style="background-color: var(--wp-surface-1); border-color: var(--wp-border) !important;">
+  <div class="container-fluid px-4">
+    <div class="row align-items-center gy-3">
+      <div class="col-md-6 text-center text-md-start">
+        <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-2">
+          <span class="fw-bold text-main">Web<span class="text-cyan">Pulse</span></span>
+          <span class="text-dim">|</span>
+          <span class="small text-muted">Website Performance Analyzer & Optimization Lab</span>
+        </div>
+        <div class="small text-dim mt-1">
+          Computer Engineering Capstone &bull; Built with Flask, SQLite, Bootstrap 5 & Playwright
+        </div>
+      </div>
+      <div class="col-md-6 text-center text-md-end">
+        <div class="d-flex align-items-center justify-content-center justify-content-md-end gap-3 small">
+          <span class="badge rounded-pill bg-success-subtle text-emerald border border-success-subtle">
+            <i class="bi bi-shield-check me-1"></i> Sandboxed Environment
+          </span>
+          <a href="{{ url_for('main.features') }}" class="text-muted text-decoration-none hover-cyan">Features</a>
+          <a href="{{ url_for('main.about') }}" class="text-muted text-decoration-none hover-cyan">About & Docs</a>
+          <span class="text-dim">&copy; {{ current_year }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>

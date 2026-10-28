@@ -1,0 +1,63 @@
+<aside class="workspace-sidebar d-none d-md-flex">
+  <div class="sidebar-section-title">Workspace</div>
+  <a href="{{ url_for('dashboard.index') }}" class="sidebar-nav-item {% if request.endpoint == 'dashboard.index' %}active{% endif %}">
+    <i class="bi bi-grid-fill"></i>
+    <span>Dashboard</span>
+  </a>
+
+  <div class="sidebar-section-title mt-3">Projects & Lab</div>
+  <a href="{{ url_for('projects.index') }}" class="sidebar-nav-item {% if 'projects.' in request.endpoint and request.endpoint != 'projects.create' %}active{% endif %}">
+    <i class="bi bi-folder-fill"></i>
+    <span>All Projects</span>
+  </a>
+  <a href="{{ url_for('projects.create') }}" class="sidebar-nav-item {% if request.endpoint == 'projects.create' %}active{% endif %}">
+    <i class="bi bi-plus-circle-fill text-cyan"></i>
+    <span>Create Project</span>
+  </a>
+
+  <div class="sidebar-section-title mt-3">Quick Navigation</div>
+  {% if version is defined and version %}
+    <a href="{{ url_for('projects.version_detail', project_id=version.project_id, version_id=version.id) }}" class="sidebar-nav-item {% if request.endpoint == 'projects.version_detail' %}active{% endif %}">
+      <i class="bi bi-folder2-open"></i>
+      <span>File Inventory</span>
+    </a>
+    <a href="{{ url_for('analysis.findings', version_id=version.id) }}" class="sidebar-nav-item {% if request.endpoint == 'analysis.findings' %}active{% endif %}">
+      <i class="bi bi-search"></i>
+      <span>Static Findings</span>
+    </a>
+    <a href="{{ url_for('analysis.graph', version_id=version.id) }}" class="sidebar-nav-item {% if request.endpoint == 'analysis.graph' %}active{% endif %}">
+      <i class="bi bi-diagram-3-fill"></i>
+      <span>Dependency Graph</span>
+    </a>
+    <a href="{{ url_for('performance.audit', version_id=version.id) }}" class="sidebar-nav-item {% if request.endpoint == 'performance.audit' %}active{% endif %}">
+      <i class="bi bi-stopwatch-fill"></i>
+      <span>Performance Audit</span>
+    </a>
+    <a href="{{ url_for('recommendations.index', version_id=version.id) }}" class="sidebar-nav-item {% if request.endpoint == 'recommendations.index' %}active{% endif %}">
+      <i class="bi bi-lightning-charge-fill"></i>
+      <span>Recommendations</span>
+    </a>
+    <a href="{{ url_for('reports.html_report', version_id=version.id) }}" target="_blank" class="sidebar-nav-item">
+      <i class="bi bi-file-earmark-pdf-fill"></i>
+      <span>Printable Report <i class="bi bi-box-arrow-up-right ms-1 small"></i></span>
+    </a>
+  {% else %}
+    <span class="text-dim small ps-3">Select a project version to inspect analysis suite.</span>
+  {% endif %}
+
+  <div class="sidebar-section-title mt-3">Settings</div>
+  <a href="{{ url_for('auth.account') }}" class="sidebar-nav-item {% if request.endpoint == 'auth.account' %}active{% endif %}">
+    <i class="bi bi-gear-fill"></i>
+    <span>Account Settings</span>
+  </a>
+
+  <div class="mt-auto pt-3 border-top" style="border-color: rgba(255,255,255,0.08) !important;">
+    <div class="p-2 rounded-3" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);">
+      <div class="d-flex align-items-center gap-2">
+        <div class="status-indicator-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></div>
+        <span class="small text-muted">Analysis Suite</span>
+      </div>
+      <div class="small fw-bold text-main mt-1 font-mono" style="font-size: 0.75rem;">Phases 1-8 All Active</div>
+    </div>
+  </div>
+</aside>

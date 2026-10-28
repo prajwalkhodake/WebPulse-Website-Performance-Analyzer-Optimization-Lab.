@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Optimization Recommendations — {{ version.project.name }}{% endblock %}
+
+{% block content %}
+<div class="workspace-wrapper">
+  {% include 'components/sidebar.html' %}
+
+  <div class="workspace-content">
+    <div class="mb-4">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb small">
+          <li class="breadcrumb-item"><a href="{{ url_for('projects.index') }}" class="text-cyan text-decoration-none">Projects</a></li>
+          <li class="breadcrumb-item"><a href="{{ url_for('projects.detail', project_id=version.project.id) }}" class="text-cyan text-decoration-none">{{ version.project.name }}</a></li>
+          <li class="breadcrumb-item"><a href="{{ url_for('projects.version_detail', project_id=version.project.id, version_id=version.id) }}" class="text-cyan text-decoration-none">{{ version.version_label }}</a></li>
+          <li class="breadcrumb-item active text-muted" aria-current="page">Recommendations</li>
+        </ol>
+      </nav>
+
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div>
+          <h2 class="fw-bold text-main mb-1">Prioritized Action Plan</h2>
+          <p class="text-muted small mb-0">Deterministic recommendations prioritized by estimated impact, severity, and verification confidence</p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <form method="POST" action="{{ url_for('recommendations.refresh', version_id=version.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-outline-cyan btn-sm px-3">
+              <i class="bi bi-arrow-clockwise me-1"></i> Recalculate Priorities
+            </button>
+          </form>
+          <a href="{{ url_for('reports.html_report', version_id=version.id) }}" target="_blank" class="btn btn-cyan btn-sm px-3">
+            <i class="bi bi-file-earmark-pdf me-1"></i> Export PDF/Report
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recommendations Cards -->
+    {% if recommendations %}
+      <div class="d-flex flex-column gap-4 mb-4">
+        {% for rec in recommendations %}
+          <div class="card-wp p-4" style="border-left: 4px solid {% if rec.priority == 'high' %}var(--wp-rose){% elif rec.priority == 'medium' %}var(--wp-amber){% else %}var(--wp-cyan){% endif %} !important;">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+              <div class="d-flex align-items-center gap-2">
+                {% if rec.priority == 'high' %}
+                  <span class="badge badge-critical text-uppercase"><i class="bi bi-exclamation-triangle-fill me-1"></i> High Priority</span>
+                {% elif rec.priority == 'medium' %}
+                  <span class="badge badge-warning text-uppercase"><i class="bi bi-exclamation-circle-fill me-1"></i> Medium Priority</span>
+                {% else %}
+                  <span class="badge badge-info text-uppercase"><i class="bi bi-info-circle-fill me-1"></i> Low Priority</span>
+                {% endif %}
+                <span class="badge bg-secondary font-mono">Rule: {{ rec.rule_id }}</span>
+              </div>
+              <span class="badge rounded-pill bg-dark border border-secondary text-dim font-mono">
+                Priority Score: <strong>{{ rec.priority_score|round(0) }} pts</strong>
+              </span>
+            </div>
+
+            <h5 class="fw-bold text-main mb-2">{{ rec.title }}</h5>
+
+            <div class="p-3 rounded mb-3" style="background: var(--wp-surface-1); border: 1px solid var(--wp-border);">
+              <div class="small text-dim text-uppercase fw-bold mb-2">Recommended Step-by-Step Remediation:</div>
+              <div class="small text-main" style="white-space: pre-line; line-height: 1.6;">{{ rec.action_plan }}</div>
+            </div>
+
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-2 border-top" style="border-color: rgba(255,255,255,0.06) !important;">
+              <div class="small text-dim font-mono">
+                <i class="bi bi-file-earmark me-1 text-cyan"></i> Target Resource: <span class="text-main">{{ rec.affected_resource }}</span>
+              </div>
+              {% if rec.potential_benefit %}
+                <div class="small text-emerald fw-semibold">
+                  <i class="bi bi-graph-up-arrow me-1"></i> {{ rec.potential_benefit }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card-wp p-5 text-center my-4">
+        <i class="bi bi-check2-all text-emerald display-4 d-block mb-3"></i>
+        <h5 class="fw-bold text-main mb-2">No Open Recommendations</h5>
+        <p class="text-muted small mb-0">Either all performance targets are met or static analysis has not yet been triggered.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

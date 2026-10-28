@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Features & Capabilities{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row mb-5">
+    <div class="col-lg-8 mx-auto text-center">
+      <span class="badge badge-info text-uppercase px-3 py-1 mb-3">Feature Architecture</span>
+      <h1 class="fw-bold text-main">Comprehensive Lab Suite</h1>
+      <p class="text-muted lead">
+        Explore the specialized engines powering WebPulse's website quality and performance diagnostics.
+      </p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Feature 1 -->
+    <div class="col-md-6">
+      <div class="card-wp p-4 h-100">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="rounded-3 p-3" style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2);">
+            <i class="bi bi-shield-lock-fill fs-4 text-cyan"></i>
+          </div>
+          <div>
+            <h4 class="fw-bold text-main mb-0">Secure Archive Ingestion</h4>
+            <span class="small text-muted font-mono">Phase 2 Engine</span>
+          </div>
+        </div>
+        <p class="text-muted small">
+          A dedicated archive validation pipeline verifies every uploaded project. It computes compression ratios, enforces strict size thresholds, normalizes file paths to neutralize Zip Slip vulnerabilities, and stores files in private storage directories completely detached from public web servers.
+        </p>
+        <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-0 border-top pt-3" style="border-color: rgba(255,255,255,0.06) !important;">
+          <li><i class="bi bi-check2 text-cyan me-1"></i> Multi-tier file extension & MIME type verification</li>
+          <li><i class="bi bi-check2 text-cyan me-1"></i> Path traversal and symlink rejection</li>
+          <li><i class="bi bi-check2 text-cyan me-1"></i> Atomic extraction with rollback on failure</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Feature 2 -->
+    <div class="col-md-6">
+      <div class="card-wp p-4 h-100">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="rounded-3 p-3" style="background: rgba(129, 140, 248, 0.1); border: 1px solid rgba(129, 140, 248, 0.2);">
+            <i class="bi bi-code-slash fs-4 text-indigo"></i>
+          </div>
+          <div>
+            <h4 class="fw-bold text-main mb-0">Rule-Based Static Analysis</h4>
+            <span class="small text-muted font-mono">Phase 3 Engine</span>
+          </div>
+        </div>
+        <p class="text-muted small">
+          Inspects project files using Beautiful Soup and AST parsers. Rather than broad regex guesswork, the static analyzer performs AST parsing to detect missing accessibility attributes, duplicate script references, render-blocking stylesheets, and unoptimized raster assets.
+        </p>
+        <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-0 border-top pt-3" style="border-color: rgba(255,255,255,0.06) !important;">
+          <li><i class="bi bi-check2 text-indigo me-1"></i> Line-level error attribution and evidence snippets</li>
+          <li><i class="bi bi-check2 text-indigo me-1"></i> Severity tiers: Critical, High, Medium, Low, Informational</li>
+          <li><i class="bi bi-check2 text-indigo me-1"></i> Confidence ratings differentiating heuristics from definitive issues</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Feature 3 -->
+    <div class="col-md-6">
+      <div class="card-wp p-4 h-100">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="rounded-3 p-3" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2);">
+            <i class="bi bi-diagram-3-fill fs-4 text-emerald"></i>
+          </div>
+          <div>
+            <h4 class="fw-bold text-main mb-0">Cytoscape Dependency Mapping</h4>
+            <span class="small text-muted font-mono">Phase 4 Engine</span>
+          </div>
+        </div>
+        <p class="text-muted small">
+          Renders interactive, zoomable network graphs illustrating file references throughout the project. See how HTML documents import CSS stylesheets, how CSS requests custom web fonts or background SVGs, and identify dangling broken references immediately.
+        </p>
+        <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-0 border-top pt-3" style="border-color: rgba(255,255,255,0.06) !important;">
+          <li><i class="bi bi-check2 text-emerald me-1"></i> Color-coded nodes by file category (HTML, CSS, JS, Image, Font)</li>
+          <li><i class="bi bi-check2 text-emerald me-1"></i> Red highlight edges indicating broken local paths</li>
+          <li><i class="bi bi-check2 text-emerald me-1"></i> Node selection with detailed metadata inspector</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Feature 4 -->
+    <div class="col-md-6">
+      <div class="card-wp p-4 h-100">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="rounded-3 p-3" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2);">
+            <i class="bi bi-stopwatch-fill fs-4 text-amber"></i>
+          </div>
+          <div>
+            <h4 class="fw-bold text-main mb-0">Playwright Sandbox Testing</h4>
+            <span class="small text-muted font-mono">Phase 6 Engine</span>
+          </div>
+        </div>
+        <p class="text-muted small">
+          Executes project entry points in a sandboxed headless Chromium instance. Captures real navigation timings (DOM Content Loaded, Load event), network request waterfalls, HTTP status codes, failed asset fetches, and JavaScript console exceptions.
+        </p>
+        <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-0 border-top pt-3" style="border-color: rgba(255,255,255,0.06) !important;">
+          <li><i class="bi bi-check2 text-amber me-1"></i> Strict process isolation with CPU and execution time limits</li>
+          <li><i class="bi bi-check2 text-amber me-1"></i> Resource timing waterfall chart via Chart.js</li>
+          <li><i class="bi bi-check2 text-amber me-1"></i> Transparent lab measurement disclosures without fake scores</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center mt-5">
+    <a href="{{ url_for('auth.register') }}" class="btn btn-cyan btn-lg px-4">
+      Create Your Account to Start Testing
+    </a>
+  </div>
+</div>
+{% endblock %}

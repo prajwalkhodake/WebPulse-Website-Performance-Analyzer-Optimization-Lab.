@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}Workspace Dashboard{% endblock %}
+
+{% block content %}
+<div class="workspace-wrapper">
+  {% include 'components/sidebar.html' %}
+
+  <div class="workspace-content">
+    <!-- Header with Quick Actions -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+      <div>
+        <h2 class="fw-bold text-main mb-1">
+          Welcome, <span class="text-cyan">{{ current_user.username }}</span>
+        </h2>
+        <p class="text-muted small mb-0">Overview of website performance audits and optimization labs</p>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <form method="POST" action="{{ url_for('projects.seed_demo') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-outline-cyan btn-sm d-flex align-items-center gap-1 px-3">
+            <i class="bi bi-magic"></i> Seed Demo Project
+          </button>
+        </form>
+        <a href="{{ url_for('projects.create') }}" class="btn btn-cyan btn-sm d-flex align-items-center gap-1 px-3">
+          <i class="bi bi-plus-lg"></i> New Project
+        </a>
+      </div>
+    </div>
+
+    <!-- Metric Cards Grid -->
+    <div class="row g-3 mb-4">
+      <div class="col-sm-6 col-xl-3">
+        <div class="card-wp p-3">
+          <div class="d-flex align-items-center justify-content-between text-muted small mb-1">
+            <span class="text-uppercase fw-bold text-dim">Total Projects</span>
+            <i class="bi bi-folder-fill text-cyan fs-5"></i>
+          </div>
+          <div class="h2 fw-bold text-main mb-0">{{ total_projects }}</div>
+          <div class="small text-dim mt-1">Managed workspaces</div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-xl-3">
+        <div class="card-wp p-3">
+          <div class="d-flex align-items-center justify-content-between text-muted small mb-1">
+            <span class="text-uppercase fw-bold text-dim">Uploaded Versions</span>
+            <i class="bi bi-archive-fill text-indigo fs-5"></i>
+          </div>
+          <div class="h2 fw-bold text-main mb-0">{{ total_versions }}</div>
+          <div class="small text-dim mt-1">Archived snapshots</div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-xl-3">
+        <div class="card-wp p-3">
+          <div class="d-flex align-items-center justify-content-between text-muted small mb-1">
+            <span class="text-uppercase fw-bold text-dim">Static Audits</span>
+            <i class="bi bi-activity text-emerald fs-5"></i>
+          </div>
+          <div class="h2 fw-bold text-main mb-0">{{ total_analyses }}</div>
+          <div class="small text-dim mt-1">Code inspections executed</div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-xl-3">
+        <div class="card-wp p-3">
+          <div class="d-flex align-items-center justify-content-between text-muted small mb-1">
+            <span class="text-uppercase fw-bold text-dim">Discovered Findings</span>
+            <i class="bi bi-exclamation-triangle-fill text-amber fs-5"></i>
+          </div>
+          <div class="h2 fw-bold text-main mb-0">{{ total_findings }}</div>
+          <div class="small text-amber mt-1">Identified issues</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Projects Table or Empty State -->
+    {% if projects %}
+      <div class="card-wp p-4 mb-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="fw-bold text-main mb-0">Your Projects</h5>
+          <a href="{{ url_for('projects.index') }}" class="small text-cyan text-decoration-none">View All <i class="bi bi-arrow-right"></i></a>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-dark table-hover align-middle mb-0" style="background: transparent;">
+            <thead>
+              <tr class="border-bottom" style="border-color: rgba(255,255,255,0.08) !important;">
+                <th class="text-dim small text-uppercase">Project Name</th>
+                <th class="text-dim small text-uppercase">Versions</th>
+                <th class="text-dim small text-uppercase">Latest Snapshot</th>
+                <th class="text-dim small text-uppercase">Analysis Status</th>
+                <th class="text-dim small text-uppercase">Performance Score</th>
+                <th class="text-dim small text-uppercase text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in recent_projects %}
+                {% set latest_v = p.latest_version %}
+                <tr style="border-color: rgba(255,255,255,0.04);">
+                  <td>
+                    <a href="{{ url_for('projects.detail', project_id=p.id) }}" class="fw-bold text-main text-decoration-none hover-cyan">
+                      {{ p.name }}
+                    </a>
+                    {% if p.is_demo %}
+                      <span class="badge rounded-pill bg-info-subtle text-cyan ms-1" style="font-size: 0.65rem;">DEMO</span>
+                    {% endif %}
+                    <div class="small text-dim">{{ p.description[:60] if p.description else 'Static Web Project' }}</div>
+                  </td>
+                  <td>
+                    <span class="badge rounded bg-secondary">{{ p.version_count }}</span>
+                  </td>
+                  <td>
+                    {% if latest_v %}
+                      <div class="font-mono small text-muted">{{ latest_v.version_label }}</div>
+                      <div class="small text-dim">{{ latest_v.uploaded_at.strftime('%b %d, %H:%M') }}</div>
+                    {% else %}
+                      <span class="text-dim small">No upload yet</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if latest_v and latest_v.has_analysis %}
+                      <span class="badge badge-success"><i class="bi bi-check-circle me-1"></i> Completed</span>
+                    {% elif latest_v %}
+                      <span class="badge badge-warning"><i class="bi bi-hourglass-split me-1"></i> Pending Audit</span>
+                    {% else %}
+                      <span class="badge bg-secondary">Awaiting Archive</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if latest_v and latest_v.latest_test_run and latest_v.latest_test_run.performance_score %}
+                      {% set score = latest_v.latest_test_run.performance_score %}
+                      <span class="badge {% if score >= 80 %}badge-success{% elif score >= 50 %}badge-warning{% else %}badge-critical{% endif %} font-mono">
+                        {{ score }} / 100
+                      </span>
+                    {% else %}
+                      <span class="text-dim small">Not Tested</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-end">
+                    <a href="{{ url_for('projects.detail', project_id=p.id) }}" class="btn btn-sm btn-outline-light px-3">
+                      Open <i class="bi bi-arrow-right"></i>
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% else %}
+      <!-- Empty State with Instant Demo Seed -->
+      <div class="card-wp p-5 text-center my-4">
+        <div class="mx-auto rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 72px; height: 72px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.25);">
+          <i class="bi bi-folder-plus fs-2 text-cyan"></i>
+        </div>
+        <h4 class="fw-bold text-main mb-2">No Projects in Workspace Yet</h4>
+        <p class="text-muted small mx-auto mb-4" style="max-width: 540px;">
+          Get started right away by uploading your website ZIP archive, or click <strong>Seed Demo Project</strong> to instantly generate a realistic sample portfolio with pre-configured before-and-after optimization releases!
+        </p>
+
+        <div class="d-flex align-items-center justify-content-center gap-3">
+          <form method="POST" action="{{ url_for('projects.seed_demo') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-outline-cyan px-4 py-2">
+              <i class="bi bi-magic me-1"></i> Seed Demo Project
+            </button>
+          </form>
+          <a href="{{ url_for('projects.create') }}" class="btn btn-cyan px-4 py-2">
+            <i class="bi bi-cloud-arrow-up me-1"></i> Create & Upload Project
+          </a>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

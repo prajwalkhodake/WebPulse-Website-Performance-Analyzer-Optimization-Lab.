@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}Performance Audit — {{ version.project.name }}{% endblock %}
+
+{% block content %}
+<div class="workspace-wrapper">
+  {% include 'components/sidebar.html' %}
+
+  <div class="workspace-content">
+    <div class="mb-4">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb small">
+          <li class="breadcrumb-item"><a href="{{ url_for('projects.index') }}" class="text-cyan text-decoration-none">Projects</a></li>
+          <li class="breadcrumb-item"><a href="{{ url_for('projects.detail', project_id=version.project.id) }}" class="text-cyan text-decoration-none">{{ version.project.name }}</a></li>
+          <li class="breadcrumb-item"><a href="{{ url_for('projects.version_detail', project_id=version.project.id, version_id=version.id) }}" class="text-cyan text-decoration-none">{{ version.version_label }}</a></li>
+          <li class="breadcrumb-item active text-muted" aria-current="page">Performance Audit</li>
+        </ol>
+      </nav>
+
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div>
+          <h2 class="fw-bold text-main mb-1">Playwright Browser Performance Audit</h2>
+          <p class="text-muted small mb-0">Navigation Timing API measurements and request waterfalls collected in an isolated Chromium sandbox</p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <form method="POST" action="{{ url_for('performance.run_test', version_id=version.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="preset" value="desktop">
+            <button type="submit" class="btn btn-outline-cyan btn-sm px-3">
+              <i class="bi bi-arrow-clockwise me-1"></i> Re-Run Desktop Audit
+            </button>
+          </form>
+          <a href="{{ url_for('reports.html_report', version_id=version.id) }}?print=1" target="_blank" class="btn btn-cyan btn-sm px-3">
+            <i class="bi bi-file-earmark-pdf-fill me-1"></i> Print / Save as PDF
+          </a>
+          <a href="{{ url_for('reports.html_report', version_id=version.id) }}" target="_blank" class="btn btn-outline-light btn-sm px-3">
+            <i class="bi bi-file-earmark-richtext me-1"></i> View Report
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Score & Key Timings Banner -->
+    <div class="card-wp p-4 mb-4">
+      <div class="row align-items-center gy-3">
+        <div class="col-md-3 text-center border-end-md" style="border-color: rgba(255,255,255,0.08) !important;">
+          {% set score = test_run.performance_score or 0 %}
+          <div class="score-circle mx-auto mb-2 {% if score >= 80 %}score-good{% elif score >= 50 %}score-medium{% else %}score-poor{% endif %}">
+            <span>{{ score }}</span>
+          </div>
+          <div class="small fw-bold text-main">WEBPULSE SCORE</div>
+          <div class="small text-dim">{{ test_run.preset|capitalize }} Sandbox Audit</div>
+        </div>
+
+        <div class="col-md-9 ps-md-4">
+          <div class="row g-3">
+            <div class="col-6 col-lg-3">
+              <div class="p-2 rounded" style="background: var(--wp-surface-1); border: 1px solid var(--wp-border);">
+                <div class="text-dim small text-uppercase fw-bold">First Contentful (FCP)</div>
+                <div class="h4 fw-bold text-main mt-1 mb-0 font-mono">{{ test_run.fcp_ms or 0 }} <span class="small text-dim">ms</span></div>
+                <span class="badge {% if test_run.fcp_ms and test_run.fcp_ms <= 1800 %}badge-success{% elif test_run.fcp_ms and test_run.fcp_ms <= 3000 %}badge-warning{% else %}badge-critical{% endif %} mt-1">
+                  {% if test_run.fcp_ms and test_run.fcp_ms <= 1800 %}Good (<1.8s){% else %}Needs Imp{% endif %}
+                </span>
+              </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+              <div class="p-2 rounded" style="background: var(--wp-surface-1); border: 1px solid var(--wp-border);">
+                <div class="text-dim small text-uppercase fw-bold">Largest Contentful (LCP)</div>
+                <div class="h4 fw-bold text-main mt-1 mb-0 font-mono">{{ test_run.lcp_ms or 0 }} <span class="small text-dim">ms</span></div>
+                <span class="badge {% if test_run.lcp_ms and test_run.lcp_ms <= 2500 %}badge-success{% elif test_run.lcp_ms and test_run.lcp_ms <= 4000 %}badge-warning{% else %}badge-critical{% endif %} mt-1">
+                  {% if test_run.lcp_ms and test_run.lcp_ms <= 2500 %}Good (<2.5s){% else %}Needs Imp{% endif %}
+                </span>
+              </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+              <div class="p-2 rounded" style="background: var(--wp-surface-1); border: 1px solid var(--wp-border);">
+                <div class="text-dim small text-uppercase fw-bold">Layout Shift (CLS)</div>
+                <div class="h4 fw-bold text-main mt-1 mb-0 font-mono">{{ test_run.cls_score or 0.000 }}</div>
+                <span class="badge {% if test_run.cls_score and test_run.cls_score <= 0.1 %}badge-success{% else %}badge-critical{% endif %} mt-1">
+                  {% if test_run.cls_score and test_run.cls_score <= 0.1 %}Good (<0.1){% else %}Shift Detected{% endif %}
+                </span>
+              </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+              <div class="p-2 rounded" style="background: var(--wp-surface-1); border: 1px solid var(--wp-border);">
+                <div class="text-dim small text-uppercase fw-bold">Load Event</div>
+                <div class="h4 fw-bold text-main mt-1 mb-0 font-mono">{{ test_run.load_event_ms or 0 }} <span class="small text-dim">ms</span></div>
+                <span class="badge badge-info mt-1">DOM: {{ test_run.dom_content_loaded_ms or 0 }} ms</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Network Waterfall Timeline -->
+    <div class="card-wp p-4 mb-4">
+      <div class="d-flex align-items-center justify-content-between border-bottom pb-3 mb-3" style="border-color: rgba(255,255,255,0.08) !important;">
+        <div>
+          <h5 class="fw-bold text-main mb-0">Network Resource Waterfall</h5>
+          <span class="small text-dim">{{ test_run.total_requests }} requests &bull; {{ test_run.total_transferred_kb }} KB transferred &bull; {{ test_run.failed_requests }} failed</span>
+        </div>
+        <span class="badge badge-info font-mono">{{ test_run.browser_info }}</span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="waterfall-table">
+          <thead>
+            <tr>
+              <th style="width: 80px;">Status</th>
+              <th style="width: 320px;">Resource Name</th>
+              <th style="width: 100px;">Type</th>
+              <th style="width: 100px;">Size</th>
+              <th style="width: 100px;">Duration</th>
+              <th>Timing Waterfall</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in resources %}
+              <tr>
+                <td>
+                  {% if r.is_failed or (r.status_code and r.status_code >= 400) %}
+                    <span class="badge badge-critical font-mono">{{ r.status_code or 'FAIL' }}</span>
+                  {% else %}
+                    <span class="badge badge-success font-mono">{{ r.status_code or 200 }}</span>
+                  {% endif %}
+                </td>
+                <td class="text-truncate" style="max-width: 320px;" title="{{ r.url }}">
+                  <code class="text-main small">{{ r.resource_name }}</code>
+                </td>
+                <td>
+                  <span class="badge bg-secondary font-mono small text-uppercase">{{ r.resource_type }}</span>
+                </td>
+                <td class="font-mono small text-dim">{{ r.transfer_size_kb }} KB</td>
+                <td class="font-mono small text-dim">{{ r.duration_ms|round(1) }} ms</td>
+                <td>
+                  <div class="waterfall-bar-container">
+                    {# Calculate simple relative percentage for visual representation #}
+                    {% set max_duration = test_run.load_event_ms or 1000 %}
+                    {% set left_pct = (r.start_time_ms / max_duration * 100)|round(1) if max_duration > 0 else 0 %}
+                    {% set width_pct = (r.duration_ms / max_duration * 100)|round(1) if max_duration > 0 else 5 %}
+                    <div class="waterfall-bar bar-{{ r.resource_type }}" style="left: {{ [left_pct, 90]|min }}%; width: {{ [width_pct, 5]|max }}%;"></div>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- JavaScript Console Errors -->
+    {% if test_run.console_errors %}
+      <div class="card-wp p-4 mb-4" style="border-left: 4px solid var(--wp-rose) !important;">
+        <h5 class="fw-bold text-main mb-3 d-flex align-items-center gap-2">
+          <i class="bi bi-bug-fill text-rose"></i> JavaScript Console Errors ({{ test_run.console_error_count }})
+        </h5>
+        <div class="p-3 rounded bg-dark border border-secondary font-mono small text-rose" style="background-color: #0b101b !important;">
+          {% for err in test_run.console_errors %}
+            <div class="mb-1">&bull; {{ err }}</div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}All Projects{% endblock %}
+
+{% block content %}
+<div class="workspace-wrapper">
+  {% include 'components/sidebar.html' %}
+
+  <div class="workspace-content">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+      <div>
+        <h2 class="fw-bold text-main mb-1">Projects & Workspaces</h2>
+        <p class="text-muted small mb-0">Manage website codebases, version snapshots, and performance history</p>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <form method="POST" action="{{ url_for('projects.seed_demo') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-outline-cyan btn-sm d-flex align-items-center gap-1 px-3">
+            <i class="bi bi-magic"></i> Seed Demo Project
+          </button>
+        </form>
+        <a href="{{ url_for('projects.create') }}" class="btn btn-cyan btn-sm d-flex align-items-center gap-1 px-3">
+          <i class="bi bi-plus-lg"></i> Create Project
+        </a>
+      </div>
+    </div>
+
+    {% if projects %}
+      <div class="row g-4">
+        {% for project in projects %}
+          {% set latest_v = project.latest_version %}
+          <div class="col-md-6 col-xl-4">
+            <div class="card-wp p-4 h-100 d-flex flex-column card-wp-hover">
+              <div class="d-flex align-items-start justify-content-between mb-3">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="p-2 rounded-3" style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2);">
+                    <i class="bi bi-folder-fill fs-5 text-cyan"></i>
+                  </div>
+                  <div>
+                    <h5 class="fw-bold text-main mb-0">
+                      <a href="{{ url_for('projects.detail', project_id=project.id) }}" class="text-main text-decoration-none hover-cyan">
+                        {{ project.name }}
+                      </a>
+                    </h5>
+                    <span class="small text-dim">{{ project.project_type }}</span>
+                  </div>
+                </div>
+
+                {% if project.is_demo %}
+                  <span class="badge rounded-pill bg-info-subtle text-cyan" style="font-size: 0.65rem;">DEMO</span>
+                {% endif %}
+              </div>
+
+              <p class="text-muted small mb-4 flex-grow-1">
+                {{ project.description or 'Static website codebase ready for static audit and browser lab testing.' }}
+              </p>
+
+              <div class="p-3 rounded-3 mb-3" style="background: var(--wp-surface-1); border: 1px solid var(--wp-border);">
+                <div class="d-flex align-items-center justify-content-between small text-muted mb-2">
+                  <span>Versions Tracked:</span>
+                  <span class="fw-bold text-main">{{ project.version_count }}</span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between small text-muted mb-2">
+                  <span>Latest Release:</span>
+                  <span class="font-mono text-cyan">{{ latest_v.version_label if latest_v else 'None' }}</span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between small text-muted">
+                  <span>Performance Score:</span>
+                  {% if latest_v and latest_v.latest_test_run and latest_v.latest_test_run.performance_score %}
+                    {% set score = latest_v.latest_test_run.performance_score %}
+                    <span class="badge {% if score >= 80 %}badge-success{% elif score >= 50 %}badge-warning{% else %}badge-critical{% endif %} font-mono">
+                      {{ score }} / 100
+                    </span>
+                  {% else %}
+                    <span class="text-dim">Not Benchmarked</span>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center justify-content-between mt-auto">
+                <span class="small text-dim">Updated: {{ project.updated_at.strftime('%b %d, %Y') }}</span>
+                <a href="{{ url_for('projects.detail', project_id=project.id) }}" class="btn btn-sm btn-outline-cyan">
+                  Open Project <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card-wp p-5 text-center my-4">
+        <div class="mx-auto rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 72px; height: 72px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.25);">
+          <i class="bi bi-folder-plus fs-2 text-cyan"></i>
+        </div>
+        <h4 class="fw-bold text-main mb-2">No Projects Found</h4>
+        <p class="text-muted small mx-auto mb-4" style="max-width: 480px;">
+          Create your first project or generate our sample architecture portfolio to explore the complete analysis suite.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+          <form method="POST" action="{{ url_for('projects.seed_demo') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-outline-cyan px-4">
+              <i class="bi bi-magic me-1"></i> Seed Demo Project
+            </button>
+          </form>
+          <a href="{{ url_for('projects.create') }}" class="btn btn-cyan px-4">
+            <i class="bi bi-plus-lg me-1"></i> Create Project
+          </a>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

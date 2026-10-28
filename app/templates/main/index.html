@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+
+{% block title %}Website Performance Analyzer & Optimization Lab{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="py-5 border-bottom"
+  style="background: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.12) 0%, rgba(15, 23, 42, 0) 70%);">
+  <div class="container py-4 text-center">
+    <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-4"
+      style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.25);">
+      <span class="small text-cyan fw-semibold">WebPulse lab v1.0</span>
+    </div>
+
+    <h1 class="display-4 fw-extrabold text-main mb-3" style="letter-spacing: -0.03em;">
+      Analyze, Benchmark & Optimize Websites <br class="d-none d-md-block">
+      <span class="text-cyan">Before You Deploy</span>
+    </h1>
+
+    <p class="lead text-muted mx-auto mb-4" style="max-width: 760px; font-size: 1.15rem;">
+      WebPulse is an advanced performance analyzer and optimization lab. Upload your local web project ZIP archives to
+      run deep static code inspections, generate Cytoscape dependency graphs, and execute controlled browser performance
+      tests.
+    </p>
+
+    <div class="d-flex align-items-center justify-content-center gap-3 flex-wrap">
+      {% if current_user.is_authenticated %}
+      <a href="{{ url_for('dashboard.index') }}"
+        class="btn btn-cyan btn-lg px-4 py-2 d-flex align-items-center gap-2 shadow">
+        <i class="bi bi-speedometer2"></i> Open Workspace
+      </a>
+      {% else %}
+      <a href="{{ url_for('auth.register') }}"
+        class="btn btn-cyan btn-lg px-4 py-2 d-flex align-items-center gap-2 shadow">
+        <i class="bi bi-rocket-takeoff"></i> Get Started Free
+      </a>
+      <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg px-4 py-2">
+        Sign In
+      </a>
+      {% endif %}
+      <a href="{{ url_for('main.about') }}"
+        class="btn btn-dark border border-secondary btn-lg px-4 py-2 text-muted hover-cyan">
+        <i class="bi bi-journal-code me-1"></i> Architecture Docs
+      </a>
+    </div>
+
+    <!-- Live Preview Mockup Card -->
+    <div class="mt-5 mx-auto card-wp p-3 p-md-4 text-start shadow-lg"
+      style="max-width: 980px; background-color: var(--wp-surface-2);">
+      <div class="d-flex align-items-center justify-content-between border-bottom pb-3 mb-3"
+        style="border-color: rgba(255,255,255,0.08) !important;">
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge rounded-circle p-1 bg-danger" style="width: 10px; height: 10px;"></span>
+          <span class="badge rounded-circle p-1 bg-warning" style="width: 10px; height: 10px;"></span>
+          <span class="badge rounded-circle p-1 bg-success" style="width: 10px; height: 10px;"></span>
+          <span class="ms-2 font-mono small text-dim">sample-portfolio-v1.zip &bull; Analysis Run #01</span>
+        </div>
+        <span class="badge badge-success"><i class="bi bi-shield-check me-1"></i> Verified Safe Archive</span>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-6 col-lg-3">
+          <div class="p-3 rounded-3" style="background: var(--wp-surface-1); border: 1px solid var(--wp-border);">
+            <div class="text-dim small text-uppercase fw-bold">Performance</div>
+            <div class="d-flex align-items-baseline gap-2 mt-1">
+              <span class="h3 mb-0 fw-bold text-cyan">92</span>
+              <span class="text-dim small">/ 100</span>
+            </div>
+            <div class="small text-emerald mt-1"><i class="bi bi-arrow-up-short"></i> Baseline</div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="p-3 rounded-3" style="background: var(--wp-surface-1); border: 1px solid var(--wp-border);">
+            <div class="text-dim small text-uppercase fw-bold">DOM Load</div>
+            <div class="d-flex align-items-baseline gap-2 mt-1">
+              <span class="h3 mb-0 fw-bold text-main">340</span>
+              <span class="text-dim small">ms</span>
+            </div>
+            <div class="small text-muted mt-1">Controlled Sandbox</div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="p-3 rounded-3" style="background: var(--wp-surface-1); border: 1px solid var(--wp-border);">
+            <div class="text-dim small text-uppercase fw-bold">Asset Footprint</div>
+            <div class="d-flex align-items-baseline gap-2 mt-1">
+              <span class="h3 mb-0 fw-bold text-main">482</span>
+              <span class="text-dim small">KB</span>
+            </div>
+            <div class="small text-amber mt-1">3 images uncompressed</div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="p-3 rounded-3" style="background: var(--wp-surface-1); border: 1px solid var(--wp-border);">
+            <div class="text-dim small text-uppercase fw-bold">Static Findings</div>
+            <div class="d-flex align-items-baseline gap-2 mt-1">
+              <span class="h3 mb-0 fw-bold text-rose">4</span>
+              <span class="text-dim small">issues</span>
+            </div>
+            <div class="small text-dim mt-1">2 render-blocking scripts</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Key Pillars Section -->
+<section class="py-5" style="background-color: var(--wp-bg-main);">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold text-main">Engineered For Depth, Not Generic CRUD</h2>
+      <p class="text-muted mx-auto" style="max-width: 650px;">
+        Every analysis metric in WebPulse is backed by verifiable code evidence or sandboxed browser measurements.
+      </p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="card-wp p-4 h-100 card-wp-hover">
+          <div class="rounded-3 p-3 d-inline-block mb-3"
+            style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2);">
+            <i class="bi bi-file-earmark-code fs-3 text-cyan"></i>
+          </div>
+          <h5 class="fw-bold text-main mb-2">Static Analysis Engine</h5>
+          <p class="text-muted small mb-0">
+            Parses HTML, CSS, JavaScript, and assets using Beautiful Soup and AST tokenizers. Pinpoints missing alt
+            tags, render-blocking scripts, and oversized assets with line-level accuracy.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="card-wp p-4 h-100 card-wp-hover">
+          <div class="rounded-3 p-3 d-inline-block mb-3"
+            style="background: rgba(129, 140, 248, 0.1); border: 1px solid rgba(129, 140, 248, 0.2);">
+            <i class="bi bi-diagram-3 fs-3 text-indigo"></i>
+          </div>
+          <h5 class="fw-bold text-main mb-2">Cytoscape Dependency Graph</h5>
+          <p class="text-muted small mb-0">
+            Maps relationships between HTML entry points, imported stylesheets, scripts, fonts, and images.
+            Interactively identify orphaned assets and circular references.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="card-wp p-4 h-100 card-wp-hover">
+          <div class="rounded-3 p-3 d-inline-block mb-3"
+            style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2);">
+            <i class="bi bi-browser-chrome fs-3 text-emerald"></i>
+          </div>
+          <h5 class="fw-bold text-main mb-2">Browser Sandbox Testing</h5>
+          <p class="text-muted small mb-0">
+            Launches headless Chromium via Playwright in an isolated execution sandbox. Captures real resource timings,
+            navigation events, JavaScript console errors, and Core Web Vitals.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="card-wp p-4 h-100 card-wp-hover">
+          <div class="rounded-3 p-3 d-inline-block mb-3"
+            style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2);">
+            <i class="bi bi-arrow-left-right fs-3 text-amber"></i>
+          </div>
+          <h5 class="fw-bold text-main mb-2">Version Diffs & Reports</h5>
+          <p class="text-muted small mb-0">
+            Upload revised archives to inspect before-and-after improvements. Verifies whether recommendations were
+            applied, tracking resolved issues, regressions, and byte savings.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Security & Architecture Section -->
+<section class="py-5 border-top border-bottom" style="background-color: var(--wp-surface-1);">
+  <div class="container py-4">
+    <div class="row align-items-center gy-4">
+      <div class="col-lg-6">
+        <span class="badge badge-warning text-uppercase px-2 py-1 mb-3">Security Architecture</span>
+        <h2 class="fw-bold text-main mb-3">Safe Handling of Untrusted Archives</h2>
+        <p class="text-muted">
+          Uploaded ZIP files are untrusted by definition. WebPulse enforces strict multi-layer defense before extracting
+          any content:
+        </p>
+        <ul class="list-unstyled text-muted small d-flex flex-column gap-2 mb-4">
+          <li class="d-flex align-items-center gap-2">
+            <i class="bi bi-check-circle-fill text-emerald"></i>
+            <span><strong>Anti-Zip-Slip:</strong> Normalizes every path and prevents directory traversal
+              (<code>../</code>) and absolute root paths.</span>
+          </li>
+          <li class="d-flex align-items-center gap-2">
+            <i class="bi bi-check-circle-fill text-emerald"></i>
+            <span><strong>Zip Bomb Mitigation:</strong> Enforces 50MB uncompressed ceiling and 100:1 compression ratio
+              limits.</span>
+          </li>
+          <li class="d-flex align-items-center gap-2">
+            <i class="bi bi-check-circle-fill text-emerald"></i>
+            <span><strong>Isolated Storage:</strong> Files are stored in private directories outside public static
+              serving paths.</span>
+          </li>
+          <li class="d-flex align-items-center gap-2">
+            <i class="bi bi-check-circle-fill text-emerald"></i>
+            <span><strong>No Arbitrary Code Execution:</strong> Server never executes uploaded shell scripts, npm
+              packages, or server-side binaries.</span>
+          </li>
+        </ul>
+        <a href="{{ url_for('main.about') }}" class="btn btn-outline-cyan">
+          Learn More About Security Architecture <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+      </div>
+      <div class="col-lg-6">
+        <div class="card-wp p-4 font-mono small text-dim" style="background-color: #0b101b;">
+          <div class="text-emerald mb-2">// WebPulse Defense-in-Depth Pipeline</div>
+          <div><span class="text-indigo">[1] POST</span> /projects/&lt;id&gt;/versions/upload</div>
+          <div class="ps-3">&bull; Validate MIME type & file extension (.zip)</div>
+          <div class="ps-3">&bull; Inspect ZipFile header without extraction</div>
+          <div class="ps-3">&bull; Compute compression ratio (&lt; 100:1) & entry count (&lt; 500)</div>
+          <div class="text-emerald mt-2">// Path Sanitization</div>
+          <div class="ps-3">&bull; Reject symlinks, device files & traversal sequences</div>
+          <div class="ps-3">&bull; Generate server-side UUID storage prefix</div>
+          <div class="text-cyan mt-2">// Private Extraction</div>
+          <div class="ps-3">&bull; Target: <span
+              class="text-main">storage/extracted/user_&lt;id&gt;/ver_&lt;uuid&gt;</span></div>
+          <div class="ps-3">&bull; Never exposed to static web root</div>
+          <div class="text-amber mt-2">// Status: Ready for Static & Sandbox Analysis</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

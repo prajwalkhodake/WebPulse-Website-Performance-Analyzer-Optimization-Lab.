@@ -1,0 +1,293 @@
+/* ==========================================================================
+   WebPulse Design System & Developer Workspace Theme
+   Aesthetics: Deep slate developer palette, glass accents, precise typography
+   ========================================================================== */
+
+:root {
+  --wp-bg-main: #090d16;
+  --wp-surface-1: #0f172a;
+  --wp-surface-2: #141e33;
+  --wp-surface-3: #1e293b;
+  --wp-border: rgba(255, 255, 255, 0.08);
+  --wp-border-focus: #38bdf8;
+  
+  --wp-text-main: #f8fafc;
+  --wp-text-muted: #94a3b8;
+  --wp-text-dim: #64748b;
+
+  --wp-cyan: #38bdf8;
+  --wp-indigo: #818cf8;
+  --wp-emerald: #10b981;
+  --wp-amber: #f59e0b;
+  --wp-rose: #ef4444;
+
+  --wp-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --wp-font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+  background-color: var(--wp-bg-main);
+  color: var(--wp-text-main);
+  font-family: var(--wp-font-sans);
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+code, pre, .font-mono {
+  font-family: var(--wp-font-mono) !important;
+}
+
+/* Glass & Card Surfaces */
+.card-wp {
+  background-color: var(--wp-surface-2);
+  border: 1px solid var(--wp-border);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-wp:hover {
+  border-color: rgba(56, 189, 248, 0.25);
+}
+
+.card-wp-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.6), 0 0 15px -3px rgba(56, 189, 248, 0.15);
+}
+
+/* Navbar & Top Bar */
+.navbar-wp {
+  background-color: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--wp-border);
+  z-index: 1020;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+}
+
+.navbar-brand .brand-pulse {
+  color: var(--wp-cyan);
+}
+
+/* Sidebar Layout */
+.workspace-wrapper {
+  display: flex;
+  flex: 1;
+}
+
+.workspace-sidebar {
+  width: 250px;
+  background-color: var(--wp-surface-1);
+  border-right: 1px solid var(--wp-border);
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem 0.75rem;
+  min-height: calc(100vh - 57px);
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  color: var(--wp-text-muted);
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  transition: all 0.15s ease;
+}
+
+.sidebar-nav-item:hover {
+  color: var(--wp-text-main);
+  background-color: var(--wp-surface-3);
+}
+
+.sidebar-nav-item.active {
+  color: var(--wp-cyan);
+  background-color: rgba(56, 189, 248, 0.12);
+  font-weight: 600;
+}
+
+.sidebar-section-title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--wp-text-dim);
+  padding: 0.75rem 0.85rem 0.35rem 0.85rem;
+  font-weight: 700;
+}
+
+.workspace-content {
+  flex: 1;
+  padding: 1.75rem 2rem;
+  max-width: 1400px;
+}
+
+/* Metric Gauges & Badges */
+.metric-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+}
+
+.badge-critical {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge-warning {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: #fcd34d;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-info {
+  background-color: rgba(56, 189, 248, 0.15);
+  color: #7dd3fc;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.badge-success {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+/* Score Circle */
+.score-circle {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.5rem;
+  border: 4px solid;
+}
+
+.score-circle.score-good {
+  color: var(--wp-emerald);
+  border-color: var(--wp-emerald);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.score-circle.score-medium {
+  color: var(--wp-amber);
+  border-color: var(--wp-amber);
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.score-circle.score-poor {
+  color: var(--wp-rose);
+  border-color: var(--wp-rose);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+/* Drag & Drop Upload Zone */
+.upload-dropzone {
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  text-align: center;
+  background-color: rgba(15, 23, 42, 0.5);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.upload-dropzone:hover, .upload-dropzone.dragover {
+  border-color: var(--wp-cyan);
+  background-color: rgba(56, 189, 248, 0.04);
+}
+
+/* Cytoscape Container */
+#cy-container {
+  width: 100%;
+  height: 600px;
+  background-color: #0b101b;
+  border-radius: 8px;
+  border: 1px solid var(--wp-border);
+  position: relative;
+}
+
+/* Waterfall Table & Timeline */
+.waterfall-table {
+  width: 100%;
+  font-size: 0.85rem;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.waterfall-table th {
+  background-color: var(--wp-surface-1);
+  color: var(--wp-text-dim);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--wp-border);
+}
+
+.waterfall-table td {
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  vertical-align: middle;
+}
+
+.waterfall-bar-container {
+  position: relative;
+  width: 100%;
+  height: 18px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.waterfall-bar {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  border-radius: 2px;
+  min-width: 4px;
+}
+
+.bar-document { background-color: #38bdf8; }
+.bar-stylesheet { background-color: #818cf8; }
+.bar-script { background-color: #f59e0b; }
+.bar-image { background-color: #10b981; }
+.bar-font { background-color: #ec4899; }
+.bar-fetch { background-color: #a855f7; }
+.bar-other { background-color: #94a3b8; }
+.bar-failed { background-color: #ef4444; }
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--wp-bg-main);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--wp-surface-3);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--wp-text-dim);
+}
