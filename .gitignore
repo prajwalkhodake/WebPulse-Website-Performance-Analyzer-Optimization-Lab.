@@ -37,10 +37,8 @@ instance/
 
 # Private upload & extracted project archives
 storage/
-media_private/
 test_storage/
 tests/test_storage/
-_legacy_django/
 
 # Pytest / Coverage
 .pytest_cache/

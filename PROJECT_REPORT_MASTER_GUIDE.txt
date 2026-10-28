@@ -1,0 +1,737 @@
+================================================================================
+WEBPULSE — WEBSITE PERFORMANCE ANALYZER & OPTIMIZATION LAB
+COMPREHENSIVE TECHNICAL PROJECT REPORT & ENGINEERING DOSSIER
+================================================================================
+
+DOCUMENT METADATA:
+------------------
+Project Title       : WebPulse — Website Performance Analyzer & Optimization Lab
+Academic Focus      : Full-Stack Web Engineering, Performance Profiling & Static Analysis
+Application Type    : Developer Diagnostics Suite & Local Performance Laboratory
+Backend Framework   : Python 3.13 / Flask 3.1 / SQLAlchemy 2.0 / Werkzeug 3.1
+Frontend Framework  : React 18 / Babel Standalone / Bootstrap 5.3 / Cytoscape.js 3.28
+Database Engine     : Dual Support — MySQL 8.0 (PyMySQL) & SQLite 3
+Headless Engine     : Playwright 1.50 (Isolated Chromium Sandbox)
+Test Suite          : Pytest 9.2 (29 Automated Tests — 100% Passing)
+Document Purpose    : Master reference for academic reports, viva defense, portfolio
+                      documentation, and system architecture walkthroughs.
+
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+1. EXECUTIVE SUMMARY & ABSTRACT
+2. MOTIVATION & PROBLEM STATEMENT (THE PRE-DEPLOYMENT BLINDSPOT)
+3. PROJECT GOALS & OBJECTIVES
+4. SYSTEM ARCHITECTURE & DATA FLOW
+5. TECHNOLOGY STACK & DESIGN JUSTIFICATIONS
+6. COMPLETE DATABASE SCHEMA & ENTITY RELATIONSHIPS
+7. DETAILED MODULE BREAKDOWN (ALL 8 DEVELOPMENT PHASES)
+8. FRONTEND REACT 18 COMPONENT ARCHITECTURE
+9. STATIC ANALYSIS ENGINE & HEURISTIC RULES
+10. HEADLESS BROWSER AUDIT & NAVIGATION TIMING API
+11. VERSION COMPARISON & DELTA ENGINE
+12. SECURITY ARCHITECTURE & ANTI-ZIP-SLIP DEFENSE
+13. VERIFICATION, TEST SUITE & QUALITY ASSURANCE
+14. INSTALLATION, CONFIGURATION & USER MANUAL
+15. GLOSSARY OF TECHNICAL TERMS & METRICS
+16. CONCLUSION & FUTURE SCOPE
+
+
+================================================================================
+1. EXECUTIVE SUMMARY & ABSTRACT
+================================================================================
+WebPulse is an educational, portfolio-grade developer laboratory designed for 
+pre-deployment web performance optimization, static code analysis, and interactive 
+dependency modeling. 
+
+Unlike conventional performance evaluation tools (such as Google PageSpeed Insights, 
+GTmetrix, or WebPageTest) that require public DNS addresses and deployed servers, 
+WebPulse allows developers, students, and engineers to upload raw ZIP archives of 
+their website source code before committing to production.
+
+The application securely ingests and extracts source archives, conducts multi-file 
+static inspection across HTML, CSS, JavaScript, and multimedia assets, generates 
+an interactive Cytoscape.js directed graph of internal asset relationships, spins 
+up an isolated, ephemeral loopback server to execute true headless Chromium browser 
+audits via Playwright, and produces deterministic, prioritized optimization 
+recommendations. Furthermore, WebPulse supports multi-version tracking, enabling 
+side-by-side comparative diffs that quantify payload byte savings, resolved issues, 
+and Core Web Vitals metric improvements.
+
+
+================================================================================
+2. MOTIVATION & PROBLEM STATEMENT (THE PRE-DEPLOYMENT BLINDSPOT)
+================================================================================
+Modern web development places heavy emphasis on user experience, Core Web Vitals, 
+and search engine rankings. However, developers face a significant architectural 
+hurdle during active development:
+
+1. THE PRE-DEPLOYMENT BLINDSPOT:
+   Existing public audit tools exclusively accept publicly routable URLs 
+   (e.g., https://example.com). Internal prototypes, student capstone projects, 
+   localhost mockups, and corporate intranet applications cannot be evaluated.
+
+2. LATE DEFECT DISCOVERY:
+   Performance defects (such as render-blocking scripts in the <head>, uncompressed 
+   raster images, missing responsive viewport meta tags, missing font-display swap 
+   directives, and circular script imports) are routinely discovered only after 
+   staging or production deployment, causing costly rework and degraded initial UX.
+
+3. FRAGMENTATION OF TOOLING:
+   Developers must typically stitch together multiple disjoint utilities: an AST 
+   linter for static code, a dependency visualizer, and a browser profiler. There 
+   is rarely a single unified environment that links static code issues with 
+   measured network waterfall traces and version-over-version progression.
+
+WebPulse bridges this gap by unifying static parsing, dependency visualization, 
+sandboxed browser simulation, and release comparison into a single self-contained 
+laboratory.
+
+
+================================================================================
+3. PROJECT GOALS & OBJECTIVES
+================================================================================
+The primary engineering objectives of WebPulse include:
+- Zero Public Dependency: Audit local static projects without requiring public URLs.
+- Multi-Tier Static Analysis: Detect anti-patterns in HTML, CSS, JS, and assets.
+- Dependency Topology Mapping: Construct and visualize directed asset dependency graphs.
+- Real Browser Measurement: Leverage Chromium to capture real Navigation Timing 
+  metrics (FCP, LCP, CLS, TTFB, Load Event, DOMContentLoaded).
+- Prioritized Action Plans: Compute impact-weighted remediation steps for developers.
+- Version Control & Comparison: Quantify delta improvements between iterative releases.
+- Hardened Security: Prevent malicious ZIP traversal (Zip-Slip), isolate ephemeral ports, 
+  and sanitize user-supplied archives.
+- High-Performance Hybrid UI: Combine server-rendered Flask templates with interactive 
+  React 18 components for dynamic controls and visualizations.
+
+
+================================================================================
+4. SYSTEM ARCHITECTURE & DATA FLOW
+================================================================================
+WebPulse follows a modular, decoupled pipeline architecture where each analysis 
+stage operates independently while persisting results in a shared relational schema:
+
+                                 +-------------------------+
+                                 |   Developer / User      |
+                                 +-------------------------+
+                                              |
+                             (Upload ZIP / Manage Project)
+                                              v
+                                 +-------------------------+
+                                 |  Safe Ingestion Engine  |
+                                 |  - Zip-Slip Sanitizer   |
+                                 |  - Quota / Size Check   |
+                                 +-------------------------+
+                                              |
+                                              v
+                 +----------------------------+----------------------------+
+                 |                                                         |
+                 v                                                         v
+   +---------------------------+                             +---------------------------+
+   |   Static Analysis Engine  |                             | Ephemeral Project Server  |
+   | - HTML Structure Parsing  |                             | - Random High-Port Server |
+   | - CSS @import & Images    |                             | - Isolated Root Directory |
+   | - JS Script References    |                             +---------------------------+
+   | - Asset Inventory         |                                           |
+   +---------------------------+                                           v
+                 |                                           +---------------------------+
+                 v                                           |  Playwright Headless Lab  |
+   +---------------------------+                             | - Chromium Launch         |
+   | Dependency Graph Engine   |                             | - Navigation Timing API   |
+   | - Node Classification     |                             | - Network Waterfall Trace |
+   | - Edge Extraction         |                             | - Console Error Capture   |
+   +---------------------------+                             +---------------------------+
+                 |                                                         |
+                 +----------------------------+----------------------------+
+                                              |
+                                              v
+                                 +-------------------------+
+                                 | Recommendation Engine   |
+                                 | - Multi-factor Scoring  |
+                                 | - Action Plan Priority  |
+                                 +-------------------------+
+                                              |
+                                              v
+                                 +-------------------------+
+                                 | Version Diff Comparator |
+                                 | - Delta Metrics (CWV)   |
+                                 | - Resolved Findings     |
+                                 | - Byte Reduction Stats  |
+                                 +-------------------------+
+                                              |
+                                              v
+                                 +-------------------------+
+                                 | Interactive React UI &  |
+                                 | Printable PDF Dossier   |
+                                 +-------------------------+
+
+
+================================================================================
+5. TECHNOLOGY STACK & DESIGN JUSTIFICATIONS
+================================================================================
+1. BACKEND:
+   - Python 3.13: Utilizes the latest modern Python interpreter with enhanced 
+     error tracebacks, performance optimizations, and memory safety.
+   - Flask 3.1: Lightweight, un-opinionated microframework providing maximum 
+     architectural flexibility, modular blueprints, and straightforward routing.
+   - Werkzeug 3.1: Production-grade WSGI utility library providing secure filename 
+     sanitization, password hashing routines, and local development serving.
+   - WTForms & Flask-WTF: Robust form validation and automated CSRF token generation.
+   - Flask-Login: Session-based user authentication and access control.
+
+2. DATABASE & ORM:
+   - SQLAlchemy 2.0: Industry-standard Object Relational Mapper offering declarative 
+     models, type safety, relationship cascading, and eager loading.
+   - Dual Database Support:
+     * MySQL 8.0 with PyMySQL: Production-grade concurrency, strict relational 
+       constraints, and utf8mb4 multi-language character encoding.
+     * SQLite 3: Zero-configuration local database for testing and immediate evaluation.
+   - Flask-Migrate (Alembic): Schema migrations tracking versioned database changes.
+
+3. FRONTEND ARCHITECTURE:
+   - React 18: Powers modular interactive UI components (Upload Dropzone, Cytoscape 
+     Graph, File Inventory Filter, DevTools Waterfall Viewer, Version Comparator).
+   - Babel Standalone: Client-side JSX transpilation via CDN, eliminating the need 
+     for complex Node.js build tools, Webpack, or npm build pipelines.
+   - Bootstrap 5.3: Modern responsive grid, modals, badges, and layout primitives.
+   - Bespoke "WebPulse Dark" Theme (webpulse.css): Premium developer aesthetic utilizing 
+     HSL slate tones (#080d1a, #0e1726, #131d31), vibrant cyan accents (#38bdf8), 
+     emerald success indicators (#10b981), and rose error highlights (#f43f5e).
+   - Cytoscape.js 3.28: Graph theory library for rendering hardware-accelerated 
+     interactive directed dependency graphs with zoom, pan, and search filtering.
+
+4. AUTOMATION & HEADLESS TESTING:
+   - Playwright 1.50 (Chromium): Isolated headless browser engine providing 
+     deterministic access to real W3C Navigation Timing API and Resource Timing API data.
+   - Ephemeral Python HTTP Server: Threaded, temporary HTTP daemon bound to dynamic 
+     loopback ports (e.g. 127.0.0.1:58432) ensuring sandboxed project execution.
+
+
+================================================================================
+6. COMPLETE DATABASE SCHEMA & ENTITY RELATIONSHIPS
+================================================================================
+WebPulse implements 10 relational entities in `app/models/`:
+
+1. `users` Table:
+   - id: Integer (PK, Auto-increment)
+   - username: String(64), Unique, Indexed, Not Null
+   - email: String(120), Unique, Indexed, Not Null
+   - password_hash: String(256), Not Null (Scrypt hashed)
+   - created_at: DateTime, Default UTC
+   - Relationships: One-to-Many with `projects`
+
+2. `projects` Table:
+   - id: Integer (PK, Auto-increment)
+   - user_id: Integer (FK -> users.id, Cascade Delete), Indexed
+   - name: String(128), Not Null
+   - description: String(500), Nullable
+   - entry_point: String(128), Default 'index.html'
+   - is_demo: Boolean, Default False
+   - created_at, updated_at: DateTime
+   - Relationships: One-to-Many with `project_versions`
+
+3. `project_versions` Table:
+   - id: Integer (PK, Auto-increment)
+   - project_id: Integer (FK -> projects.id, Cascade Delete), Indexed
+   - version_number: Integer, Not Null (Sequential 1, 2, 3...)
+   - version_label: String(64), Not Null (e.g. 'v1.0 - Initial Release')
+   - archive_filename: String(255), Not Null
+   - extracted_path: String(500), Not Null (Storage path outside web root)
+   - total_files: Integer, Default 0
+   - total_size_bytes: BigInteger, Default 0
+   - uploaded_at: DateTime
+   - Relationships: One-to-Many with `project_files`, `static_findings`, 
+     `dependency_edges`, `performance_test_runs`, `optimization_recommendations`;
+     One-to-One with `analysis_results`.
+
+4. `project_files` Table:
+   - id: Integer (PK)
+   - version_id: Integer (FK -> project_versions.id, Cascade Delete), Indexed
+   - relative_path: String(500), Not Null
+   - file_type: String(20), Not Null ('html', 'css', 'javascript', 'image', 'font', 'other')
+   - file_size_bytes: BigInteger, Not Null
+   - line_count: Integer, Nullable
+   - detected_encoding: String(30), Default 'utf-8'
+
+5. `analysis_results` Table:
+   - id: Integer (PK)
+   - version_id: Integer (FK -> project_versions.id, Cascade Delete), Unique
+   - status: String(30), Default 'pending' ('pending', 'processing', 'completed', 'failed')
+   - health_score: Integer, Default 0 (0-100 scale)
+   - total_findings: Integer, Default 0
+   - critical_count, warning_count, info_count: Integer
+   - execution_time_ms: Float
+   - analyzed_at: DateTime
+
+6. `static_findings` Table:
+   - id: Integer (PK)
+   - version_id: Integer (FK -> project_versions.id, Cascade Delete), Indexed
+   - analysis_id: Integer (FK -> analysis_results.id, Cascade Delete), Indexed
+   - affected_file_id: Integer (FK -> project_files.id, Set Null), Nullable
+   - finding_code: String(50), Not Null (e.g. 'HTML-RENDER-BLOCKING-JS')
+   - title: String(255), Not Null
+   - category: String(50), Not Null ('performance', 'accessibility', 'best_practices', 'seo')
+   - severity: String(20), Not Null ('critical', 'warning', 'info')
+   - explanation: Text, Not Null
+   - recommended_action: Text, Not Null
+   - evidence: String(500), Nullable
+   - line_number: Integer, Nullable
+   - confidence: String(20), Default 'high'
+
+7. `dependency_edges` Table:
+   - id: Integer (PK)
+   - version_id: Integer (FK -> project_versions.id, Cascade Delete), Indexed
+   - source_file_id: Integer (FK -> project_files.id, Cascade Delete)
+   - target_file_id: Integer (FK -> project_files.id, Cascade Delete)
+   - edge_type: String(30), Not Null ('script', 'stylesheet', 'image', 'hyperlink', 'font')
+   - reference_text: String(500), Nullable
+
+8. `performance_test_runs` Table:
+   - id: Integer (PK)
+   - version_id: Integer (FK -> project_versions.id, Cascade Delete), Indexed
+   - status: String(30), Default 'pending'
+   - preset: String(30), Default 'desktop' ('desktop', 'mobile')
+   - performance_score: Integer, Default 0 (0-100 scale)
+   - fcp_ms, lcp_ms, ttfb_ms, dom_content_loaded_ms, load_event_ms: Float
+   - cls_score: Float
+   - total_requests, failed_requests: Integer
+   - total_transferred_bytes: BigInteger
+   - console_error_count: Integer
+   - console_errors: JSON (List of error strings)
+   - browser_info: String(255)
+   - tested_at: DateTime
+
+9. `resource_metrics` Table:
+   - id: Integer (PK)
+   - test_run_id: Integer (FK -> performance_test_runs.id, Cascade Delete), Indexed
+   - url: String(1000), Not Null
+   - resource_name: String(255), Not Null
+   - resource_type: String(30), Default 'other' ('script', 'stylesheet', 'image', 'font', etc.)
+   - status_code: Integer, Nullable
+   - start_time_ms: Float, Default 0.0
+   - duration_ms: Float, Default 0.0
+   - transfer_size_bytes: BigInteger, Default 0
+   - is_failed: Boolean, Default False
+   - error_text: String(255)
+
+10. `optimization_recommendations` Table:
+    - id: Integer (PK)
+    - version_id: Integer (FK -> project_versions.id, Cascade Delete), Indexed
+    - rule_id: String(50), Not Null
+    - title: String(255), Not Null
+    - priority: String(20), Not Null ('high', 'medium', 'low')
+    - priority_score: Float, Default 0.0
+    - action_plan: Text, Not Null
+    - potential_benefit: String(255)
+    - affected_resource: String(255)
+
+
+================================================================================
+7. DETAILED MODULE BREAKDOWN (ALL 8 DEVELOPMENT PHASES)
+================================================================================
+
+PHASE 1: FOUNDATION, AUTHENTICATION & CORE WORKSPACE
+- Modular Flask blueprint architecture:
+  * `app/auth`: User registration, login, logout, profile update.
+  * `app/main`: Public landing page, features showcase, technical about documentation.
+  * `app/dashboard`: Multi-project workspace overview with aggregate counters.
+  * `app/errors`: Custom 403 (Forbidden), 404 (Not Found), 413 (File Too Large), 
+    and 500 (Internal Server Error) views.
+- Security baseline: HTTPOnly, SameSite cookies, CSRF protection on all forms, 
+  Scrypt password hashing, and secure HTTP response headers.
+
+PHASE 2: PROJECT MANAGEMENT & ANTI-ZIP-SLIP INGESTION
+- Multi-project containment: Users manage isolated projects with distinct entry points.
+- Secure Archive Validator (`ArchiveValidator`):
+  * Rejects files exceeding 50 MB quota.
+  * Validates ZIP header integrity.
+  * Scans every internal member path to block directory traversal attacks (Zip-Slip), 
+    symbolic links pointing outside the extraction boundary, and absolute path injection.
+- Isolated extraction: Files are uncompressed into private `storage/extracted/user_<id>/` 
+  directories strictly outside the web document root.
+- Automated file cataloging: Extracts file size, line counts, and mime classifications.
+
+PHASE 3: STATIC CODE ANALYSIS ENGINE
+- Deterministic static analyzer (`StaticAnalyzer`):
+  * Inspects HTML using structural regex parsers for missing `<title>`, missing 
+    `<meta name="viewport">`, render-blocking `<script>` tags in `<head>`, and 
+    raster images missing `alt` attributes or `width`/`height` dimensions.
+  * Inspects CSS for performance bottlenecks: synchronous `@import` statements, 
+    oversized inline base64 image URIs, and missing `font-display: swap`.
+  * Inspects JavaScript for un-deferred external scripts, missing error handling, 
+    and heavy synchronous dependencies.
+- Classifies all detected issues into standard severities (*Critical*, *Warning*, *Info*) 
+  and categories (*Performance*, *Accessibility*, *Best Practices*, *SEO*).
+
+PHASE 4: DEPENDENCY GRAPH & CYTOSCAPE MODELING
+- Graph extraction service (`DependencyMapper`):
+  * Discovers directed references between files:
+    HTML -> Script (`<script src="...">`)
+    HTML -> Stylesheet (`<link rel="stylesheet" href="...">`)
+    HTML -> Image (`<img src="...">`)
+    HTML -> Hyperlink (`<a href="...">`)
+    CSS -> Font / Image (`url(...)`)
+  * Resolves relative path targets and maps them to cataloged `project_files`.
+- API endpoint (`GET /analysis/api/<version_id>/graph-data`):
+  * Emits Cytoscape-compliant JSON payloads with node types, file sizes, in-degree, 
+    out-degree, and connected edge attributes.
+
+PHASE 5: MULTI-FACTOR SCORING & RECOMMENDATION ENGINE
+- Score calculation (`AnalysisResult.calculate_health_score()`):
+  * Base 100 points, deducting weighted penalties: Critical (-12 pts), Warning (-5 pts), 
+    Info (-1 pt). Clamped to [0, 100].
+- Recommendation prioritization engine (`RecommendationEngine`):
+  * Groups related findings and maps them to deterministic optimization playbooks.
+  * Calculates `priority_score = (SeverityWeight * 0.4) + (ConfidenceWeight * 0.3) + (EffortInversion * 0.3)`.
+  * Generates concrete, step-by-step remediation plans with estimated byte and latency gains.
+
+PHASE 6: HEADLESS BROWSER AUDIT VIA PLAYWRIGHT CHROMIUM
+- Isolated ephemeral web server (`EphemeralProjectServer`):
+  * Dynamically acquires an available high-range TCP port on 127.0.0.1.
+  * Mounts the version's extracted folder as a sandboxed document root in a background thread.
+- Browser test runner (`BrowserPerformanceRunner`):
+  * Launches headless Chromium sandbox.
+  * Navigates to `http://127.0.0.1:<ephemeral_port>/<entry_point>`.
+  * Hooks into CDP and page event listeners to record network requests and JavaScript console errors.
+  * Evaluates window performance APIs in page context:
+    `performance.getEntriesByType('paint')` -> FCP
+    `PerformanceObserver` -> LCP, CLS
+    `performance.getEntriesByType('navigation')` -> TTFB, DOMContentLoaded, Load Event
+  * Records individual resource duration, transfer size, and timeline start times for waterfalls.
+- Calculates holistic `performance_score` (0-100) combining CWV thresholds with failed request penalties.
+
+PHASE 7: VERSION COMPARISON & PRINTABLE REPORT ENGINE
+- Version diff service (`VersionComparator`):
+  * Compares any two project releases (Base vs Target / Before vs After).
+  * Safely handles pending states without triggering template errors.
+  * Computes delta improvements:
+    - Payload size delta (+/- KB)
+    - Core Web Vitals metric deltas (FCP, LCP, CLS, Load Event)
+    - Resolved findings (issues fixed in target)
+    - Regressions / new findings (issues introduced in target)
+- Standalone Printable Report Generator (`ReportGenerator`):
+  * Generates self-contained, CSS-styled HTML audit dossiers with sticky print toolbars.
+  * Embedded print stylesheet (`@media print`) format tailored for A4 PDF export.
+  * JSON export route (`GET /reports/<version_id>/json`) for machine consumption.
+
+PHASE 8: COMPREHENSIVE QA & DEMO SEEDER
+- Sample project seeder (`seed_demo_portfolio`):
+  * Instantly creates a realistic sample project: "Solaris Green Energy Portfolio".
+  * Creates `v1.0 (Unoptimized Base)`: Render-blocking scripts, uncompressed 2.8 MB PNGs, 
+    missing viewport tag, missing image dimensions.
+  * Creates `v2.0 (Optimized Release)`: Deferred scripts, modern compressed WebP images, 
+    responsive viewport, explicit image dimensions.
+  * Enables immediate testing of all graph, comparison, and audit views with a single click.
+- Automated Pytest test suite: 29 tests covering all blueprints, models, services, 
+  and error conditions.
+
+
+================================================================================
+8. FRONTEND REACT 18 COMPONENT ARCHITECTURE
+================================================================================
+WebPulse implements a hybrid architecture: Flask serves clean, server-rendered Jinja2 
+templates, while interactive user controls and dynamic visualizations are encapsulated 
+as React 18 components loaded via CDN and transpiled in-browser with Babel Standalone.
+
+Component Directory (`app/static/js/react/`):
+
+1. `WebPulseApp.jsx`:
+   - Headless root application mounted in `base.html` (`#webpulse-react-root`).
+   - `FlashAlertManager`: Auto-dismisses Bootstrap dismissible alerts after 5 seconds.
+   - `TooltipInitializer`: Discovers and initializes all Bootstrap tooltips on mount.
+   - `ActiveNavHighlighter`: Matches current URL path and assigns active styling to 
+     sidebar and navbar links.
+   - `FormSubmitSpinner`: Listens to `form[data-submit-loader]` submit events, disables 
+     submit buttons, and renders an animated SVG spinner with "Processing...".
+
+2. `UploadDropzone.jsx`:
+   - Mounted in `projects/upload.html` (`#react-upload-dropzone`).
+   - Replaces vanilla drag-and-drop listeners with a stateful React dropzone.
+   - Manages dragover, dragleave, file selection, size display in MB, and visual border 
+     highlighting.
+   - Forwards selected files to the underlying hidden WTForms `<input type="file">`, 
+     preserving server-side CSRF token handling.
+
+3. `FileInventoryFilter.jsx`:
+   - Mounted in `projects/version_detail.html` (`#react-file-filter`).
+   - Controlled input for real-time file searching.
+   - Dynamically toggles table row visibility by relative path, displays real-time match 
+     counters, and provides a quick clear button.
+
+4. `CytoscapeGraph.jsx`:
+   - Mounted in `analysis/graph.html` (`#react-cytoscape-graph`).
+   - Fetches `/analysis/api/<version_id>/graph-data` via async fetch.
+   - Manages Cytoscape canvas instance, zoom controls (zoom in, zoom out, fit to screen).
+   - Provides live node search filtering: dims non-matching nodes and highlights matching nodes.
+   - Interactive Inspector Sidebar: Clicking any node displays its relative path, file type, 
+     byte size, incoming dependencies, and outgoing references.
+
+5. `FindingsFilter.jsx`:
+   - Mounted in `analysis/findings.html` (`#react-findings-filter`).
+   - Replaces inline `onchange="this.form.submit()"` handlers with controlled React selects.
+   - Auto-submits filter forms on category or severity changes with clean query parameter handling.
+
+6. `CompareSelector.jsx`:
+   - Mounted in `projects/compare.html` (`#react-compare-selector`).
+   - Provides stateful Base and Target version selectors.
+   - Features an interactive "Swap" button that instantly reverses Base and Target releases 
+     to inspect regressions or progress from either perspective.
+
+7. `WaterfallViewer.jsx`:
+   - Mounted in `performance/audit.html` (`#react-waterfall-viewer`).
+   - DevTools-grade interactive network inspection tool.
+   - Real-time search filter by resource URL or filename.
+   - Multi-type filter buttons: All, Script, Stylesheet, Image, Font, Other, and Failed.
+   - Multi-field sorting: Timeline Start Time, Duration (slowest first), Size (largest first), 
+     and Name (A-Z).
+   - Dynamic proportional waterfall timeline bars with hover tooltips displaying start time, 
+     duration, size, and status code.
+
+
+================================================================================
+9. STATIC ANALYSIS ENGINE & HEURISTIC RULES
+================================================================================
+WebPulse's `StaticAnalyzer` inspects source code using 12 deterministic rules:
+
+RULE ID                    CATEGORY        SEVERITY   TRIGGER CONDITION
+--------------------------------------------------------------------------------
+HTML-RENDER-BLOCKING-JS    Performance     Critical   <script src="..."> in <head> without
+                                                      'defer' or 'async' attribute.
+HTML-NO-VIEWPORT           SEO / Mobile    Critical   Missing <meta name="viewport"> tag in
+                                                      HTML document head.
+HTML-NO-TITLE              SEO             Warning    Missing or empty <title> tag.
+HTML-IMG-NO-ALT            Accessibility   Warning    <img> tag missing 'alt' attribute.
+HTML-IMG-NO-DIMENSIONS     Performance     Warning    <img> tag missing 'width' or 'height'
+                                                      (causes Cumulative Layout Shift).
+CSS-SYNCHRONOUS-IMPORT     Performance     Critical   @import url(...) found in CSS file
+                                                      (serializes network requests).
+CSS-OVERSIZED-INLINE-B64   Performance     Warning    Data URI base64 payload in CSS
+                                                      exceeding 8,192 bytes.
+CSS-NO-FONT-DISPLAY        Performance     Info       @font-face declaration missing
+                                                      'font-display: swap'.
+JS-DOCUMENT-WRITE          Best Practices  Critical   Usage of document.write() found.
+JS-SYNC-XHR                Performance     Critical   Synchronous XMLHttpRequest detected.
+ASSET-OVERSIZED-RASTER     Performance     Warning    Single raster image (PNG/JPG) exceeding
+                                                      1,048,576 bytes (1 MB).
+ASSET-UNCOMPRESSED-MEDIA   Performance     Info       Presence of legacy BMP or uncompressed
+                                                      WAV files.
+
+
+================================================================================
+10. HEADLESS BROWSER AUDIT & NAVIGATION TIMING API
+================================================================================
+WebPulse uses Playwright Chromium to measure true browser runtime dynamics:
+
+1. CORE WEB VITALS (CWV):
+   - First Contentful Paint (FCP): Time when browser renders the first piece of DOM 
+     content (text, image, svg). Thresholds: <=1.8s (Good), <=3.0s (Moderate), >3.0s (Poor).
+   - Largest Contentful Paint (LCP): Render timestamp of the largest visible content element.
+     Thresholds: <=2.5s (Good), <=4.0s (Moderate), >4.0s (Poor).
+   - Cumulative Layout Shift (CLS): Sum of all layout shift scores occurring during page 
+     lifecycle. Thresholds: <=0.1 (Good), <=0.25 (Needs Imp), >0.25 (Poor).
+
+2. NETWORK TIMING API DATA:
+   - TTFB (Time to First Byte): `responseStart - requestStart`.
+   - DOMContentLoaded Event: `domContentLoadedEventEnd - navigationStart`.
+   - Load Event Duration: `loadEventEnd - navigationStart`.
+   - Transfer Size: Raw bytes transferred across the simulated wire.
+
+3. CONSOLE & EXCEPTION TRACING:
+   - Captures unhandled JavaScript exceptions, network 404s, and console errors directly 
+     from the Chromium CDP log stream.
+
+
+================================================================================
+11. VERSION COMPARISON & DELTA ENGINE
+================================================================================
+The `VersionComparator` service performs relational diffing between two `ProjectVersion` 
+entities:
+
+1. PAYLOAD DIFFERENTIAL:
+   `size_diff_bytes = v_target.total_size_bytes - v_base.total_size_bytes`
+   Categorized as byte reduction (green) or byte regression (amber).
+
+2. CODE QUALITY DIFFERENTIAL:
+   - Resolved Findings: Issues existing in Base version but absent in Target version.
+   - Regressions / New Findings: Issues absent in Base version but introduced in Target version.
+   - Persistent Findings: Issues present across both versions.
+
+3. RUNTIME PERFORMANCE DIFFERENTIAL:
+   - `score_delta = score_target - score_base`
+   - `fcp_delta = fcp_target - fcp_base`
+   - `lcp_delta = lcp_target - lcp_base`
+   - `cls_delta = cls_target - cls_base`
+   - `load_delta = load_target - load_base`
+   - Graceful fallback: If either version lacks completed audits, the UI safely renders 
+     informational badges with direct action buttons to trigger missing audits.
+
+
+================================================================================
+12. SECURITY ARCHITECTURE & ANTI-ZIP-SLIP DEFENSE
+================================================================================
+WebPulse implements defense-in-depth measures against untrusted file uploads:
+
+1. ANTI-ZIP-SLIP DEFENSE (`app/services/archive_validator.py`):
+   When users upload a ZIP archive, attackers could craft malicious entries such as:
+   `../../../../etc/passwd` or `../../app/routes.py` to overwrite system or application files.
+   
+   WebPulse enforces the following mathematical containment check for every member:
+   ```python
+   def _is_safe_path(target_directory: Path, member_path: str) -> bool:
+       resolved_target = target_directory.resolve()
+       resolved_member = (target_directory / member_path).resolve()
+       return resolved_member.is_relative_to(resolved_target)
+   ```
+   If any member attempts to escape `resolved_target`, extraction is immediately halted, 
+   all temporary files are deleted, and an explicit security alert is logged.
+
+2. STORAGE SEPARATION:
+   Extracted files are stored in `storage/extracted/user_<id>/` outside the web application's 
+   static directory. Files are never directly executable as PHP/CGI on the main server.
+
+3. EPHEMERAL PROCESS ISOLATION:
+   Browser audits execute against an ephemeral loopback server on a randomized port with 
+   strict execution timeouts (20 seconds), terminating hung worker threads automatically.
+
+
+================================================================================
+13. VERIFICATION, TEST SUITE & QUALITY ASSURANCE
+================================================================================
+The project maintains a 100% automated test pass rate verified with Pytest 9.2:
+
+TEST MODULE                     TEST CASE NAME                                     STATUS
+-----------------------------------------------------------------------------------------
+tests/test_analysis.py          test_static_analysis_and_graph_extraction          PASSED
+tests/test_analysis.py          test_cytoscape_api_endpoint                        PASSED
+tests/test_auth.py              test_user_password_hashing                         PASSED
+tests/test_auth.py              test_registration_success                          PASSED
+tests/test_auth.py              test_registration_duplicate_username               PASSED
+tests/test_auth.py              test_registration_duplicate_email                  PASSED
+tests/test_auth.py              test_registration_password_mismatch                PASSED
+tests/test_auth.py              test_registration_short_password                   PASSED
+tests/test_auth.py              test_login_success_with_username                   PASSED
+tests/test_auth.py              test_login_success_with_email                      PASSED
+tests/test_auth.py              test_login_invalid_credentials                     PASSED
+tests/test_auth.py              test_dashboard_access_control                      PASSED
+tests/test_auth.py              test_logout                                        PASSED
+tests/test_auth.py              test_account_update_profile                        PASSED
+tests/test_comparison_reports.py test_version_comparator_and_diffs                  PASSED
+tests/test_comparison_reports.py test_html_printable_report                         PASSED
+tests/test_comparison_reports.py test_json_export_endpoint                          PASSED
+tests/test_comparison_reports.py test_recommendations_generation_and_view          PASSED
+tests/test_comparison_reports.py test_version_compare_when_audits_are_pending     PASSED
+tests/test_main.py              test_landing_page                                  PASSED
+tests/test_main.py              test_features_page                                 PASSED
+tests/test_main.py              test_about_page                                    PASSED
+tests/test_main.py              test_404_error_page                                PASSED
+tests/test_main.py              test_security_headers                              PASSED
+tests/test_performance.py       test_browser_performance_runner_e2e                PASSED
+tests/test_projects.py          test_project_creation                              PASSED
+tests/test_projects.py          test_valid_archive_upload_and_inventory            PASSED
+tests/test_projects.py          test_zip_slip_rejection                            PASSED
+tests/test_projects.py          test_seed_demo_project                             PASSED
+-----------------------------------------------------------------------------------------
+TOTAL RESULT: 29 / 29 Automated Tests Passed (100% Green in ~4.0 seconds)
+
+
+================================================================================
+14. INSTALLATION, CONFIGURATION & USER MANUAL
+================================================================================
+
+PREREQUISITES:
+- Python 3.11+ (Python 3.13 recommended)
+- MySQL 8.0+ (Optional — SQLite is pre-configured as an instant zero-config fallback)
+- Modern Web Browser (Chrome, Safari, Edge, Firefox)
+
+STEP 1: CLONE & NAVIGATE
+```bash
+git clone https://github.com/prajwalkhodake/WebPulse-Website-Performance-Analyzer-Optimization-Lab..git webpulse
+cd webpulse
+```
+
+STEP 2: VIRTUAL ENVIRONMENT & DEPENDENCIES
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+playwright install chromium
+```
+
+STEP 3: ENVIRONMENT CONFIGURATION
+Create or inspect the `.env` file in the root directory:
+```env
+FLASK_APP=run.py
+FLASK_ENV=development
+FLASK_DEBUG=1
+PORT=5001
+SECRET_KEY=webpulse-dev-secret-key-change-in-prod-xyz987
+DATABASE_URL=mysql+pymysql://webpulse_user:YourStrongPassword123!@localhost:3306/webpulse_db?charset=utf8mb4
+STORAGE_DIR=storage
+MAX_CONTENT_LENGTH=52428800
+```
+*(Note: To use SQLite, simply comment out or remove the DATABASE_URL line).*
+
+STEP 4: INITIALIZE DATABASE (IF USING MYSQL)
+```sql
+CREATE DATABASE IF NOT EXISTS webpulse_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER IF NOT EXISTS 'webpulse_user'@'localhost' IDENTIFIED BY 'YourStrongPassword123!';
+GRANT ALL PRIVILEGES ON webpulse_db.* TO 'webpulse_user'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+STEP 5: RUN THE SERVER
+```bash
+python3 run.py
+```
+Open **http://127.0.0.1:5001** in your browser.
+
+
+================================================================================
+15. GLOSSARY OF TECHNICAL TERMS & METRICS
+================================================================================
+- AST (Abstract Syntax Tree): A tree representation of source code structure used 
+  by compilers and static analyzers to identify patterns without code execution.
+- Anti-Zip-Slip: Security validation that ensures archived paths cannot escape the 
+  intended extraction directory via relative `../` directory traversal.
+- CLS (Cumulative Layout Shift): Core Web Vital measuring visual stability; quantifies 
+  how often content shifts unexpectedly on screen during page load.
+- Cytoscape.js: Open-source graph theory library for visualization and analysis of 
+  network structures.
+- Ephemeral Port: A temporary, dynamically allocated high-number TCP port (e.g. 54321) 
+  used for short-lived communications.
+- FCP (First Contentful Paint): Timestamp at which the browser renders the first piece 
+  of text, image, or non-white canvas.
+- Headless Browser: A web browser without a graphical user interface, controlled 
+  programmatically for automated testing and performance profiling.
+- LCP (Largest Contentful Paint): Timestamp at which the largest above-the-fold content 
+  element is fully rendered.
+- Navigation Timing API: Standard W3C interface providing high-resolution timestamps 
+  for every phase of web page retrieval and rendering.
+- TTFB (Time to First Byte): Latency between the browser initiating the HTTP GET request 
+  and receiving the first byte of response data from the server.
+- Waterfall Timeline: Visual horizontal chart displaying the sequence, start time, 
+  duration, and concurrency of all HTTP resource requests during page load.
+
+
+================================================================================
+16. CONCLUSION & FUTURE SCOPE
+================================================================================
+WebPulse delivers a fully realized, production-ready static website performance 
+laboratory. By combining rigorous static code inspection, interactive graph modeling, 
+sandboxed Chromium measurement, and side-by-side release diffing, it eliminates the 
+pre-deployment blindspot for web engineers.
+
+FUTURE ENHANCEMENTS:
+1. Automated Optimization PR Generator: Automatically generate and offer downloadable 
+   optimized ZIP packages containing minified CSS/JS and converted WebP images.
+2. Multi-Engine Browser Profiling: Expand beyond Chromium to include headless WebKit 
+   (Safari) and Firefox (Gecko) for cross-browser performance parity testing.
+3. CI/CD GitHub Action: Package WebPulse's static inspection rules as a GitHub Action 
+   to automatically enforce performance budgets on pull requests.
+4. Core Web Vitals Field Data Integration: Ingest Chrome User Experience Report (CrUX) 
+   real-user monitoring (RUM) data to correlate lab findings with real-world users.
+
+================================================================================
+END OF TECHNICAL REPORT GUIDE — WEBPULSE LABORATORY
+================================================================================
