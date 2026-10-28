@@ -89,10 +89,11 @@ function CompareSelector({ actionUrl, versions = [], initialV1, initialV2 }) {
   );
 }
 
-// Mount on DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
+// Resilient mount logic
+function mountCompareSelector() {
   const container = document.getElementById('react-compare-selector');
-  if (container) {
+  if (container && !container.dataset.reactMounted) {
+    container.dataset.reactMounted = 'true';
     try {
       const versionsData = JSON.parse(container.dataset.versions || '[]');
       const root = ReactDOM.createRoot(container);
@@ -108,4 +109,11 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Failed to parse compare selector versions JSON:', err);
     }
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', mountCompareSelector);
+} else {
+  mountCompareSelector();
+}
+

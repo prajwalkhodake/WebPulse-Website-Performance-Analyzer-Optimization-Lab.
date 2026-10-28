@@ -209,10 +209,11 @@ function WaterfallViewer({ resources = [], maxDuration = 1000, browserInfo = '' 
   );
 }
 
-// Mount on DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
+// Resilient mount logic
+function mountWaterfallViewer() {
   const container = document.getElementById('react-waterfall-viewer');
-  if (container) {
+  if (container && !container.dataset.reactMounted) {
+    container.dataset.reactMounted = 'true';
     try {
       const resourcesData = JSON.parse(container.dataset.resources || '[]');
       const maxDuration = parseFloat(container.dataset.maxDuration || '1000');
@@ -229,4 +230,11 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Failed to parse WaterfallViewer resources JSON:', err);
     }
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', mountWaterfallViewer);
+} else {
+  mountWaterfallViewer();
+}
+

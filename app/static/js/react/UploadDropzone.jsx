@@ -94,11 +94,19 @@ function UploadDropzone() {
   );
 }
 
-// Mount on DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
+// Resilient mount logic
+function mountUploadDropzone() {
   const container = document.getElementById('react-upload-dropzone');
-  if (container) {
+  if (container && !container.dataset.reactMounted) {
+    container.dataset.reactMounted = 'true';
     const root = ReactDOM.createRoot(container);
     root.render(<UploadDropzone />);
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', mountUploadDropzone);
+} else {
+  mountUploadDropzone();
+}
+

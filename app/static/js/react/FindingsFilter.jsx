@@ -65,10 +65,11 @@ function FindingsFilterBar({ actionUrl, categoryFilter, severityFilter, searchQu
   );
 }
 
-// Mount on DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
+// Resilient mount logic
+function mountFindingsFilter() {
   const container = document.getElementById('react-findings-filter');
-  if (container) {
+  if (container && !container.dataset.reactMounted) {
+    container.dataset.reactMounted = 'true';
     const root = ReactDOM.createRoot(container);
     root.render(
       <FindingsFilterBar
@@ -79,4 +80,11 @@ document.addEventListener('DOMContentLoaded', () => {
       />
     );
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', mountFindingsFilter);
+} else {
+  mountFindingsFilter();
+}
+

@@ -3,8 +3,13 @@
 {% block title %}Dependency Graph — {{ version.project.name }}{% endblock %}
 
 {% block extra_head %}
-<!-- Cytoscape.js CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+<!-- Cytoscape.js Engine (Local with CDN Fallback) -->
+<script src="{{ url_for('static', filename='js/vendor/cytoscape.min.js') }}"></script>
+<script>
+  if (typeof cytoscape === 'undefined') {
+    document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"><\/script>');
+  }
+</script>
 {% endblock %}
 
 {% block content %}

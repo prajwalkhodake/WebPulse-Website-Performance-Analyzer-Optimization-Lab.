@@ -112,10 +112,18 @@ function WebPulseApp() {
 /* ──────────────────────────────────────────────────────────
    Mount the React root
    ────────────────────────────────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
+function mountWebPulseApp() {
   const appRoot = document.getElementById('webpulse-react-root');
-  if (appRoot) {
+  if (appRoot && !appRoot.dataset.reactMounted) {
+    appRoot.dataset.reactMounted = 'true';
     const root = ReactDOM.createRoot(appRoot);
     root.render(React.createElement(WebPulseApp, null));
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', mountWebPulseApp);
+} else {
+  mountWebPulseApp();
+}
+

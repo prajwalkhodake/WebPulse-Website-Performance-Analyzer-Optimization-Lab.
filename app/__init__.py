@@ -9,6 +9,11 @@ from config import config_by_name
 from app.extensions import db, migrate, login_manager, csrf
 
 
+import mimetypes
+mimetypes.add_type('application/javascript', '.jsx')
+mimetypes.add_type('application/javascript', '.js')
+
+
 def create_app(config_name: str = None) -> Flask:
     """Create and configure an instance of the WebPulse Flask application."""
     if config_name is None:
@@ -61,9 +66,13 @@ def create_app(config_name: str = None) -> Flask:
     # Security Headers
     @app.after_request
     def set_security_headers(response):
+        from flask import request
+        if request.path.endswith('.jsx') or request.path.endswith('.js'):
+            response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
         response.headers['X-Content-Type-Options'] = 'nosniff'
         response.headers['X-Frame-Options'] = 'SAMEORIGIN'
         response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
         return response
 
     return app
+

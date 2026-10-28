@@ -35,11 +35,19 @@ function FileInventoryFilter() {
   );
 }
 
-// Mount on DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
+// Resilient mount logic
+function mountFileInventoryFilter() {
   const container = document.getElementById('react-file-filter');
-  if (container) {
+  if (container && !container.dataset.reactMounted) {
+    container.dataset.reactMounted = 'true';
     const root = ReactDOM.createRoot(container);
     root.render(<FileInventoryFilter />);
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', mountFileInventoryFilter);
+} else {
+  mountFileInventoryFilter();
+}
+
