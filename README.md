@@ -90,7 +90,14 @@ WebPulse/
 │   │   └── handlers.py       # Custom 403, 404, 413, 500 error handlers
 │   ├── static/
 │   │   ├── css/webpulse.css  # WebPulse design system, dark slate theme
-│   │   └── js/main.js        # Micro-interactions, alerts, loader feedback
+│   │   └── js/react/         # React 18 frontend component architecture
+│   │       ├── WebPulseApp.jsx        # Headless root: alerts, tooltips, loader feedback
+│   │       ├── UploadDropzone.jsx     # Interactive drag-and-drop file uploader
+│   │       ├── FileInventoryFilter.jsx# Real-time file inventory search table
+│   │       ├── CytoscapeGraph.jsx     # Interactive Cytoscape graph, inspector & zoom
+│   │       ├── FindingsFilter.jsx     # Static analysis findings filter bar
+│   │       ├── CompareSelector.jsx    # Version comparison dropdown & swap controls
+│   │       └── WaterfallViewer.jsx    # DevTools network waterfall timeline & filters
 │   └── templates/
 │       ├── base.html         # Master layout with Google Fonts & Bootstrap
 │       ├── components/       # Reusable components: navbar, footer, sidebar, flash

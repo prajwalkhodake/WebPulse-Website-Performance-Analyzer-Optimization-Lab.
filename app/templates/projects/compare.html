@@ -22,24 +22,17 @@
           <p class="text-muted small mb-0">Compare before-and-after metrics, track resolved static findings, and verify byte savings</p>
         </div>
 
-        <!-- Version Selectors -->
-        <form method="GET" action="{{ url_for('projects.compare', project_id=project.id) }}" class="d-flex align-items-center gap-2">
-          <select name="v1" class="form-select form-select-sm" onchange="this.form.submit()">
-            {% for v in versions %}
-              <option value="{{ v.id }}" {% if v.id == v_before.id %}selected{% endif %}>
-                Base: {{ v.version_label }} (#{{ v.version_number }})
-              </option>
-            {% endfor %}
-          </select>
-          <span class="text-dim">vs</span>
-          <select name="v2" class="form-select form-select-sm" onchange="this.form.submit()">
-            {% for v in versions %}
-              <option value="{{ v.id }}" {% if v.id == v_after.id %}selected{% endif %}>
-                Target: {{ v.version_label }} (#{{ v.version_number }})
-              </option>
-            {% endfor %}
-          </select>
-        </form>
+        <!-- React-powered Version Selectors -->
+        {% set versions_list = [] %}
+        {% for v in versions %}
+          {% set _ = versions_list.append({'id': v.id, 'label': v.version_label, 'number': v.version_number}) %}
+        {% endfor %}
+        <div id="react-compare-selector"
+          data-action-url="{{ url_for('projects.compare', project_id=project.id) }}"
+          data-v1="{{ v_before.id }}"
+          data-v2="{{ v_after.id }}"
+          data-versions='{{ versions_list|tojson }}'>
+        </div>
       </div>
     </div>
 
@@ -316,4 +309,8 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/babel" src="{{ url_for('static', filename='js/react/CompareSelector.jsx') }}"></script>
 {% endblock %}

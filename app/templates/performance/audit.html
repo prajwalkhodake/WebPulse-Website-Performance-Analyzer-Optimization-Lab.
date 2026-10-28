@@ -97,59 +97,33 @@
       </div>
     </div>
 
-    <!-- Network Waterfall Timeline -->
+    <!-- Network Waterfall Timeline (React-powered) -->
     <div class="card-wp p-4 mb-4">
-      <div class="d-flex align-items-center justify-content-between border-bottom pb-3 mb-3" style="border-color: rgba(255,255,255,0.08) !important;">
+      <div class="d-flex align-items-center justify-content-between mb-3">
         <div>
           <h5 class="fw-bold text-main mb-0">Network Resource Waterfall</h5>
           <span class="small text-dim">{{ test_run.total_requests }} requests &bull; {{ test_run.total_transferred_kb }} KB transferred &bull; {{ test_run.failed_requests }} failed</span>
         </div>
-        <span class="badge badge-info font-mono">{{ test_run.browser_info }}</span>
       </div>
 
-      <div class="table-responsive">
-        <table class="waterfall-table">
-          <thead>
-            <tr>
-              <th style="width: 80px;">Status</th>
-              <th style="width: 320px;">Resource Name</th>
-              <th style="width: 100px;">Type</th>
-              <th style="width: 100px;">Size</th>
-              <th style="width: 100px;">Duration</th>
-              <th>Timing Waterfall</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for r in resources %}
-              <tr>
-                <td>
-                  {% if r.is_failed or (r.status_code and r.status_code >= 400) %}
-                    <span class="badge badge-critical font-mono">{{ r.status_code or 'FAIL' }}</span>
-                  {% else %}
-                    <span class="badge badge-success font-mono">{{ r.status_code or 200 }}</span>
-                  {% endif %}
-                </td>
-                <td class="text-truncate" style="max-width: 320px;" title="{{ r.url }}">
-                  <code class="text-main small">{{ r.resource_name }}</code>
-                </td>
-                <td>
-                  <span class="badge bg-secondary font-mono small text-uppercase">{{ r.resource_type }}</span>
-                </td>
-                <td class="font-mono small text-dim">{{ r.transfer_size_kb }} KB</td>
-                <td class="font-mono small text-dim">{{ r.duration_ms|round(1) }} ms</td>
-                <td>
-                  <div class="waterfall-bar-container">
-                    {# Calculate simple relative percentage for visual representation #}
-                    {% set max_duration = test_run.load_event_ms or 1000 %}
-                    {% set left_pct = (r.start_time_ms / max_duration * 100)|round(1) if max_duration > 0 else 0 %}
-                    {% set width_pct = (r.duration_ms / max_duration * 100)|round(1) if max_duration > 0 else 5 %}
-                    <div class="waterfall-bar bar-{{ r.resource_type }}" style="left: {{ [left_pct, 90]|min }}%; width: {{ [width_pct, 5]|max }}%;"></div>
-                  </div>
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+      {% set res_list = [] %}
+      {% for r in resources %}
+        {% set _ = res_list.append({
+          'status_code': r.status_code,
+          'is_failed': r.is_failed or False,
+          'url': r.url,
+          'resource_name': r.resource_name,
+          'resource_type': r.resource_type,
+          'transfer_size_kb': r.transfer_size_kb,
+          'duration_ms': r.duration_ms,
+          'start_time_ms': r.start_time_ms
+        }) %}
+      {% endfor %}
+
+      <div id="react-waterfall-viewer"
+        data-max-duration="{{ test_run.load_event_ms or 1000 }}"
+        data-browser-info="{{ test_run.browser_info or '' }}"
+        data-resources='{{ res_list|tojson }}'>
       </div>
     </div>
 
@@ -168,4 +142,8 @@
     {% endif %}
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/babel" src="{{ url_for('static', filename='js/react/WaterfallViewer.jsx') }}"></script>
 {% endblock %}

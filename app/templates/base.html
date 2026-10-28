@@ -103,12 +103,23 @@
   <!-- Global Footer -->
   {% include 'components/footer.html' %}
 
+  <!-- React 18 Root (headless micro-interaction components) -->
+  <div id="webpulse-react-root" style="display:none;"></div>
+
   <!-- Bootstrap 5.3.3 JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
-  <!-- WebPulse Core JS -->
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <!-- React 18 via CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+  <!-- Babel Standalone for JSX compilation in browser -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- WebPulse Core React App (replaces vanilla main.js) -->
+  <script type="text/babel" src="{{ url_for('static', filename='js/react/WebPulseApp.jsx') }}"></script>
 
   {% block scripts %}{% endblock %}
+  {% block extra_scripts %}{% endblock %}
 </body>
 </html>

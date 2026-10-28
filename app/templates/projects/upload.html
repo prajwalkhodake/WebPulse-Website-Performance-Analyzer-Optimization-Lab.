@@ -25,13 +25,9 @@
           <form method="POST" action="{{ url_for('projects.upload_version', project_id=project.id) }}" enctype="multipart/form-data" novalidate data-submit-loader>
             {{ form.hidden_tag() }}
 
-            <!-- Dropzone Area -->
-            <div class="upload-dropzone mb-4" id="dropzoneContainer" onclick="document.getElementById('archiveInput').click()">
-              <i class="bi bi-cloud-arrow-up text-cyan display-4 d-block mb-3"></i>
-              <h5 class="fw-bold text-main mb-1" id="dropzoneTitle">Click to browse or drag and drop your project ZIP file</h5>
-              <p class="text-muted small mb-0" id="dropzoneSubtitle">Accepts .zip archives only (up to 50 MB max)</p>
-              {{ form.archive(class="d-none", id="archiveInput", onchange="handleFileSelect(this)") }}
-            </div>
+            <!-- React-powered Dropzone Area -->
+            <div id="react-upload-dropzone" class="mb-0"></div>
+            {{ form.archive(class="d-none", id="archiveInput") }}
             {% for error in form.archive.errors %}
               <div class="text-rose small mb-3"><i class="bi bi-exclamation-triangle me-1"></i>{{ error }}</div>
             {% endfor %}
@@ -80,39 +76,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-function handleFileSelect(input) {
-  if (input.files && input.files[0]) {
-    const file = input.files[0];
-    const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
-    document.getElementById('dropzoneTitle').innerText = file.name;
-    document.getElementById('dropzoneSubtitle').innerText = `${sizeMb} MB — Ready to Ingest`;
-    document.getElementById('dropzoneContainer').style.borderColor = 'var(--wp-cyan)';
-    document.getElementById('dropzoneContainer').style.backgroundColor = 'rgba(56, 189, 248, 0.08)';
-  }
-}
-
-// Drag & drop listeners
-const dropzone = document.getElementById('dropzoneContainer');
-['dragenter', 'dragover'].forEach(eventName => {
-  dropzone.addEventListener(eventName, (e) => {
-    e.preventDefault();
-    dropzone.classList.add('dragover');
-  }, false);
-});
-['dragleave', 'drop'].forEach(eventName => {
-  dropzone.addEventListener(eventName, (e) => {
-    e.preventDefault();
-    dropzone.classList.remove('dragover');
-  }, false);
-});
-dropzone.addEventListener('drop', (e) => {
-  const dt = e.dataTransfer;
-  const files = dt.files;
-  if (files && files[0]) {
-    document.getElementById('archiveInput').files = files;
-    handleFileSelect(document.getElementById('archiveInput'));
-  }
-});
-</script>
+<!-- React UploadDropzone Component -->
+<script type="text/babel" src="{{ url_for('static', filename='js/react/UploadDropzone.jsx') }}"></script>
 {% endblock %}

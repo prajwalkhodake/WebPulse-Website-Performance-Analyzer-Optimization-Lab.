@@ -136,7 +136,7 @@
         </div>
 
         <div class="d-flex align-items-center gap-2">
-          <input type="text" id="fileSearchInput" class="form-control form-control-sm" placeholder="Filter files by path..." style="max-width: 260px;" onkeyup="filterFilesTable()">
+          <div id="react-file-filter"></div>
         </div>
       </div>
 
@@ -192,14 +192,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-function filterFilesTable() {
-  const query = document.getElementById('fileSearchInput').value.toLowerCase();
-  const rows = document.querySelectorAll('#fileInventoryTable .file-row');
-  rows.forEach(row => {
-    const text = row.innerText.toLowerCase();
-    row.style.display = text.includes(query) ? '' : 'none';
-  });
-}
-</script>
+<!-- React File Inventory Filter Component -->
+<script type="text/babel" src="{{ url_for('static', filename='js/react/FileInventoryFilter.jsx') }}"></script>
 {% endblock %}

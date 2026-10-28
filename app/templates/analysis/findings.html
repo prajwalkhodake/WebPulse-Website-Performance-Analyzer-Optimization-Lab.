@@ -34,38 +34,14 @@
       </div>
     </div>
 
-    <!-- Filter Bar -->
+    <!-- React-powered Filter Bar -->
     <div class="card-wp p-3 mb-4">
-      <form method="GET" action="{{ url_for('analysis.findings', version_id=version.id) }}" class="row g-2 align-items-center">
-        <div class="col-md-5">
-          <div class="input-group input-group-sm">
-            <span class="input-group-text bg-dark border-secondary text-dim"><i class="bi bi-search"></i></span>
-            <input type="text" name="q" value="{{ search_query }}" class="form-control" placeholder="Search by title, explanation, or filename...">
-          </div>
-        </div>
-        <div class="col-md-3">
-          <select name="category" class="form-select form-select-sm" onchange="this.form.submit()">
-            <option value="">All Categories</option>
-            <option value="performance" {% if category_filter == 'performance' %}selected{% endif %}>Performance</option>
-            <option value="accessibility" {% if category_filter == 'accessibility' %}selected{% endif %}>Accessibility</option>
-            <option value="best_practices" {% if category_filter == 'best_practices' %}selected{% endif %}>Best Practices</option>
-            <option value="seo" {% if category_filter == 'seo' %}selected{% endif %}>SEO & Discoverability</option>
-          </select>
-        </div>
-        <div class="col-md-3">
-          <select name="severity" class="form-select form-select-sm" onchange="this.form.submit()">
-            <option value="">All Severities</option>
-            <option value="critical" {% if severity_filter == 'critical' %}selected{% endif %}>Critical</option>
-            <option value="warning" {% if severity_filter == 'warning' %}selected{% endif %}>Warning</option>
-            <option value="info" {% if severity_filter == 'info' %}selected{% endif %}>Informational</option>
-          </select>
-        </div>
-        <div class="col-md-1 text-end">
-          <a href="{{ url_for('analysis.findings', version_id=version.id) }}" class="btn btn-sm btn-outline-light w-100" title="Reset Filters">
-            <i class="bi bi-x-circle"></i>
-          </a>
-        </div>
-      </form>
+      <div id="react-findings-filter"
+        data-action-url="{{ url_for('analysis.findings', version_id=version.id) }}"
+        data-category-filter="{{ category_filter }}"
+        data-severity-filter="{{ severity_filter }}"
+        data-search-query="{{ search_query }}">
+      </div>
     </div>
 
     <!-- Findings List Accordion / Cards -->
@@ -113,4 +89,8 @@
     {% endif %}
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/babel" src="{{ url_for('static', filename='js/react/FindingsFilter.jsx') }}"></script>
 {% endblock %}
